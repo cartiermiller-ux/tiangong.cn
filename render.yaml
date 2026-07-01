@@ -1,0 +1,50 @@
+# Render.com 部署配置
+# 文档: https://render.com/docs/blueprint-spec
+# 使用方法: 在 Render 控制台 New → Blueprint，选择本仓库
+
+services:
+  - type: web
+    name: avatar-sea-shop
+    runtime: node
+    plan: free              # 免费计划（750小时/月，15分钟无活动自动休眠）
+    region: singapore       # 新加坡节点（离中国最近）
+    branch: main
+    rootDir: .
+    buildCommand: cd server && npm install
+    startCommand: bash render-start.sh
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22.0.0"
+      - key: NODE_ENV
+        value: production
+      - key: DB_PATH
+        value: /opt/render/project/src/data/shop.db
+      - key: JWT_SECRET
+        generateValue: true   # Render 自动生成随机密钥
+      - key: FRONTEND_URL
+        value: https://skyagent-artifacts.tiangong.cn
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        value: admin123456
+      # SMTP 邮件（可选，在 Render 控制台手动添加）
+      # - key: SMTP_HOST
+      # - key: SMTP_PORT
+      # - key: SMTP_USER
+      # - key: SMTP_PASS
+      # - key: SMTP_FROM
+      # 支付宝（可选，在 Render 控制台手动添加）
+      # - key: ALIPAY_APP_ID
+      # - key: ALIPAY_APP_PRIVATE_KEY
+      # - key: ALIPAY_ALIPAY_PUBLIC_KEY
+      # - key: ALIPAY_NOTIFY_URL
+      # - key: ALIPAY_SANDBOX
+
+    # ⚠️ 免费计划不支持持久磁盘！
+    # 如需持久化 SQLite 数据（推荐），升级到 Starter 计划（$7/月）并取消注释以下磁盘配置:
+    # disks:
+    #   - name: shop-data
+    #     mountPath: /data
+    #     sizeGB: 1            # 1GB 仅 $0.25/月
