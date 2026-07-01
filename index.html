@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>阿凡达在海上 - 商品展示</title>
+<style>
+  :root {
+    --primary: #f5f7fa;
+    --secondary: #ffffff;
+    --accent: #4a90e2;
+    --accent-dark: #357abd;
+    --text: #2c3e50;
+    --text-dim: #7f8c8d;
+    --border: #e1e8ed;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--primary);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  a { color: inherit; }
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--secondary);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    box-shadow: var(--shadow);
+  }
+  .nav-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    gap: 2rem;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent), #667eea);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+  .logo-text {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .nav-search {
+    flex: 1;
+    max-width: 400px;
+    position: relative;
+  }
+  .nav-search input {
+    width: 100%;
+    padding: 10px 16px 10px 40px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+    transition: all 0.3s;
+    background: var(--primary);
+  }
+  .nav-search input:focus {
+    border-color: var(--accent);
+    background: var(--secondary);
+  }
+  .nav-search .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-dim);
+    font-size: 0.95rem;
+  }
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+  }
+  .btn {
+    padding: 9px 20px;
+    border-radius: 7px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover {
+    background: var(--accent-dark);
+    transform: translateY(-1px);
+  }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-outline:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 12px;
+    background: var(--primary);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .user-info:hover {
+    background: #e8ecf1;
+  }
+  .user-avatar {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent), #667eea);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+  .user-details {
+    display: flex;
+    flex-direction: column;
+  }
+  .user-name {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .user-balance {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+  .main-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  .announcement {
+    background: var(--secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow);
+  }
+  .announcement-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--accent);
+  }
+  .announcement-content {
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: var(--text);
+  }
+  .announcement-content p {
+    margin-bottom: 8px;
+  }
+  .announcement-content strong {
+    color: var(--text);
+  }
+  .announcement-content a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .announcement-content a:hover {
+    text-decoration: underline;
+  }
+  .categories {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  .category-tag {
+    padding: 10px 20px;
+    background: var(--secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  .category-tag:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .category-tag.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .category-count {
+    background: rgba(255,255,255,0.2);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+  }
+  .category-tag.active .category-count {
+    background: rgba(255,255,255,0.3);
+  }
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .product-card {
+    background: var(--secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  .product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent);
+  }
+  .product-img-wrapper {
+    position: relative;
+    height: 160px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  .product-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .product-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #fff;
+  }
+  .badge-hot { background: #e74c3c; }
+  .badge-new { background: #27ae60; }
+  .badge-vip { background: #f39c12; }
+  .product-info {
+    padding: 16px;
+  }
+  .product-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .product-desc {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .product-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .product-price {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #e74c3c;
+  }
+  .product-price .original {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    text-decoration: line-through;
+    font-weight: 400;
+    margin-left: 8px;
+  }
+  .product-stock {
+    font-size: 0.8rem;
+    color: #27ae60;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .product-stock .dot {
+    width: 6px;
+    height: 6px;
+    background: #27ae60;
+    border-radius: 50%;
+  }
+  .product-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .product-actions .btn {
+    flex: 1;
+    justify-content: center;
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+  .modal-overlay.active {
+    display: flex;
+  }
+  .modal-video-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  .modal-video-bg video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .modal-video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+  }
+  .modal {
+    position: relative;
+    background: var(--secondary);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 440px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: slideUp 0.4s ease;
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(40px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .modal-header {
+    padding: 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-header h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+  .modal-close {
+    width: 32px;
+    height: 32px;
+    background: var(--primary);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+  }
+  .modal-close:hover {
+    background: #e74c3c;
+    color: #fff;
+  }
+  .modal-body {
+    padding: 24px;
+  }
+  .auth-tabs {
+    display: flex;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--border);
+  }
+  .auth-tab {
+    flex: 1;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-dim);
+    transition: all 0.3s;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-size: 0.95rem;
+  }
+  .auth-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  .auth-form { display: none; }
+  .auth-form.active { display: block; }
+  .form-group {
+    margin-bottom: 18px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 0.88rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .form-group input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.92rem;
+    outline: none;
+    transition: all 0.3s;
+  }
+  .form-group input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  }
+  .toast-container {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .toast {
+    background: var(--secondary);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 20px;
+    box-shadow: var(--shadow-lg);
+    font-size: 0.9rem;
+    animation: slideIn 0.3s ease;
+    max-width: 360px;
+  }
+  .toast.success { border-left: 4px solid #27ae60; }
+  .toast.error { border-left: 4px solid #e74c3c; }
+  .toast.info { border-left: 4px solid var(--accent); }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(100px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @media (max-width: 768px) {
+    .nav-search { display: none; }
+    .products-grid { grid-template-columns: 1fr; }
+    .user-details { display: none; }
+  }
+</style>
+</head>
+<body style="padding-bottom: 50px;">
+<nav class="navbar">
+<div class="nav-inner">
+<a class="logo" href="#">
+<div class="logo-icon">🌊</div>
+<span class="logo-text">阿凡达在海上</span>
+</a>
+<div class="nav-search">
+<span class="search-icon">🔍</span>
+<input id="navSearchInput" oninput="handleSearch(this.value)" placeholder="搜索商品..." type="text"/>
+</div>
+<div class="nav-actions" id="navActions">
+<button class="btn btn-outline" onclick="openAuthModal('login')">登录</button>
+<button class="btn btn-primary" onclick="openAuthModal('register')">注册</button>
+</div>
+<div class="user-info" id="userInfo" onclick="toggleUserMenu()" style="display:none;">
+<div class="user-avatar">U</div>
+<div class="user-details">
+<div class="user-name">用户</div>
+<div class="user-balance">余额: ¥48.00</div>
+</div>
+</div>
+</div>
+</nav>
+<div class="main-content">
+<div class="announcement">
+<div class="announcement-header">
+<span>📢</span>
+<span>网站公告</span>
+</div>
+<div class="announcement-content">
+<p><strong>主站永久域名：</strong><a href="#">https://avatarsea.com</a> <a href="#">https://avatarsea.cn</a>（保存收藏网址）</p>
+<p><strong>客服联系方式：</strong>Telegram: @avatarsea | QQ: 2558769999 | 微信: asd666077</p>
+<p>1、本站发货为即时秒发，无需等待，不发送邮箱。付款过后没有进入下载页面的用户，通过首页"订单查询"来下载卡密！</p>
+<p>2、任何邮箱不做退换，建议先少量购买，建议进行业务测试，适用再批量购买！</p>
+<p>3、任何一款邮箱，一个IP状态下都建议不要批量登录，以免邮箱出现问题！</p>
+<p>4、购买5天后默认已使用，已使用的无售后，任何问题及时反馈！</p>
+</div>
+</div>
+<div class="categories">
+<div class="category-tag active" onclick="selectCategory(this, 'all')">
+<span>🌐</span><span>全部商品</span><span class="category-count">24</span>
+</div>
+<div class="category-tag" onclick="selectCategory(this, 'account')">
+<span>👤</span><span>账号类</span><span class="category-count">8</span>
+</div>
+<div class="category-tag" onclick="selectCategory(this, 'key')">
+<span>🔑</span><span>卡密类</span><span class="category-count">6</span>
+</div>
+<div class="category-tag" onclick="selectCategory(this, 'vip')">
+<span>👑</span><span>会员类</span><span class="category-count">5</span>
+</div>
+<div class="category-tag" onclick="selectCategory(this, 'software')">
+<span>💻</span><span>软件类</span><span class="category-count">5</span>
+</div>
+</div>
+<div class="products-grid" id="productsGrid"></div>
+</div>
+<div class="modal-overlay" id="authModal">
+<div class="modal-video-bg">
+<video autoplay="" id="avatarVideo" loop="" muted="" playsinline="">
+<source src="https://cdn.pixabay.com/video/2020/07/30/45368-447133133_large.mp4" type="video/mp4"/>
+</video>
+<div class="modal-video-overlay"></div>
+</div>
+<div class="modal">
+<div class="modal-header">
+<h3 id="authTitle"> 用户登录</h3>
+<button class="modal-close" onclick="closeModal('authModal')">✕</button>
+</div>
+<div class="modal-body">
+<div class="auth-tabs">
+<button class="auth-tab active" id="loginTab" onclick="switchAuthTab('login')">登录</button>
+<button class="auth-tab" id="registerTab" onclick="switchAuthTab('register')">注册</button>
+</div>
+<div class="auth-form active" id="loginForm">
+<div class="form-group">
+<label>📧 邮箱 / 用户名</label>
+<input id="loginEmail" placeholder="请输入邮箱或用户名" type="text"/>
+</div>
+<div class="form-group">
+<label>🔒 密码</label>
+<input id="loginPassword" placeholder="请输入密码" type="password"/>
+</div>
+<button class="btn btn-primary" onclick="handleLogin()" style="width:100%; justify-content:center; padding:12px;">登录</button>
+<p style="text-align:center; margin-top:16px; font-size:0.85rem; color:var(--text-dim);">还没有账号？<a href="#" onclick="switchAuthTab('register'); return false;" style="color:var(--accent); text-decoration:none;">立即注册</a></p>
+</div>
+<div class="auth-form" id="registerForm">
+<div class="form-group">
+<label>👤 用户名</label>
+<input id="regUsername" placeholder="请设置用户名" type="text"/>
+</div>
+<div class="form-group">
+<label>📧 邮箱</label>
+<input id="regEmail" placeholder="请输入邮箱地址" type="email"/>
+</div>
+<div class="form-group">
+<label>🔒 密码</label>
+<input id="regPassword" placeholder="请设置密码（至少6位）" type="password"/>
+</div>
+<div class="form-group">
+<label>🔒 确认密码</label>
+<input id="regPassword2" placeholder="请再次输入密码" type="password"/>
+</div>
+<button class="btn btn-primary" onclick="handleRegister()" style="width:100%; justify-content:center; padding:12px;">注册</button>
+<p style="text-align:center; margin-top:16px; font-size:0.85rem; color:var(--text-dim);">已有账号？<a href="#" onclick="switchAuthTab('login'); return false;" style="color:var(--accent); text-decoration:none;">立即登录</a></p>
+</div>
+</div>
+</div>
+</div>
+<div class="toast-container" id="toastContainer"></div>
+<script>
+const products = [
+  { id: 1, name: 'Netflix 高级会员账号', category: 'account', desc: '4K超清画质，支持4设备同时观看，全球通用，独立账号', price: 29.9, originalPrice: 59.9, stock: 156, badge: 'hot', img: 'https://picture-search.tiangong.cn/image/rt/4162e3e826b3edee647e220028fd386f.jpg' },
+  { id: 2, name: 'ChatGPT Plus 订阅', category: 'account', desc: 'GPT-4模型完整访问权限，优先响应，新特性抢先体验', price: 45.0, originalPrice: 140.0, stock: 89, badge: 'hot', img: 'https://picture-search.tiangong.cn/image/rt/70853a6c30fbb5833225e7441196700e.jpg' },
+  { id: 3, name: 'Spotify Premium 年卡', category: 'vip', desc: '无广告畅听，离线下载，高音质，全球曲库无限制', price: 39.9, originalPrice: 118.0, stock: 234, badge: 'new', img: 'https://picture-search.tiangong.cn/image/rt/2bfc43d82b5e42faa06db3fc1e042838.jpg' },
+  { id: 4, name: 'Windows 11 Pro 激活码', category: 'key', desc: '正版永久激活，支持重装，绑定主板，官方渠道', price: 19.9, originalPrice: 99.0, stock: 567, badge: 'hot', img: 'https://picture-search.tiangong.cn/image/rt/80de76985aef1f981b9e2240be7bb46f.jpg' },
+  { id: 5, name: 'Adobe Creative Cloud 全家桶', category: 'software', desc: 'PS/AI/PR/AE等全套软件，正版授权，持续更新', price: 89.0, originalPrice: 299.0, stock: 45, badge: 'vip', img: 'https://picture-search.tiangong.cn/image/rt/3cf46dcadd4025c715543e68af8916f0.jpg' },
+  { id: 6, name: 'YouTube Premium 会员', category: 'vip', desc: '无广告观看，后台播放，YouTube Music会员同步', price: 25.0, originalPrice: 80.0, stock: 178, badge: 'new', img: 'https://picture-search.tiangong.cn/image/rt/2bfc43d82b5e42faa06db3fc1e042838.jpg' },
+  { id: 7, name: 'Office 365 个人版', category: 'software', desc: 'Word/Excel/PPT全套，1TB OneDrive云存储，5设备', price: 35.0, originalPrice: 128.0, stock: 312, badge: 'hot', img: 'https://picture-search.tiangong.cn/image/rt/6cff5db64d86cb7c21f29a8ef8fa028b.jpg' },
+  { id: 8, name: 'Disney+ 高级账号', category: 'account', desc: '漫威/星战/皮克斯独家内容，4K HDR，多设备共享', price: 22.0, originalPrice: 70.0, stock: 98, badge: 'new', img: 'https://picture-search.tiangong.cn/image/rt/38891c8a43adc803b60cf7a3b06c0593.jpg' },
+  { id: 9, name: 'Midjourney 订阅服务', category: 'software', desc: 'AI绘画神器，无限生成，商业授权，快速模式', price: 55.0, originalPrice: 180.0, stock: 67, badge: 'vip', img: 'https://picture-search.tiangong.cn/image/rt/1e711f8400bb8cb771fc0d1162319fdf.jpg' },
+  { id: 10, name: 'Steam 游戏充值卡', category: 'key', desc: '全球通用Steam钱包充值，即时到账，多面额可选', price: 48.0, originalPrice: 50.0, stock: 999, badge: 'hot', img: 'https://picture-search.tiangong.cn/image/rt/93f08ce4874a60bede0622006a79d047.jpg' },
+  { id: 11, name: 'iCloud+ 2TB 空间', category: 'vip', desc: '苹果iCloud扩容，家庭共享，照片备份，设备同步', price: 18.0, originalPrice: 68.0, stock: 445, badge: 'new', img: 'https://picture-search.tiangong.cn/image/rt/fb4eb753a8ce3a085bf7cac3e7433e0a.jpg' },
+  { id: 12, name: 'GitHub Copilot 订阅', category: 'software', desc: 'AI编程助手，代码补全，支持VS Code/JetBrains', price: 42.0, originalPrice: 120.0, stock: 134, badge: 'vip', img: 'https://picture-search.tiangong.cn/image/rt/97c7d35b0b21470237c76bfa60fb585d.jpg' }
+];
+let currentCategory = 'all';
+let isLoggedIn = false;
+document.addEventListener('DOMContentLoaded', () => {
+  renderProducts(products);
+  setupVideoBackground();
+});
+function setupVideoBackground() {
+  const video = document.getElementById('avatarVideo');
+  if (video) {
+    video.addEventListener('loadedmetadata', () => { video.currentTime = 0; });
+    video.addEventListener('ended', () => { video.currentTime = 0; video.play(); });
+  }
+}
+function renderProducts(list) {
+  const grid = document.getElementById('productsGrid');
+  if (!grid) return;
+  grid.innerHTML = list.map(p => `
+    <div class="product-card" onclick="openOrder(${p.id})">
+      <div class="product-img-wrapper">
+        <img src="${p.img}" alt="${p.name}" loading="lazy">
+        <span class="product-badge badge-${p.badge}">${p.badge === 'hot' ? '🔥 热卖' : p.badge === 'new' ? '✨ 新品' : '👑 VIP'}</span>
+      </div>
+      <div class="product-info">
+        <div class="product-title">${p.name}</div>
+        <div class="product-desc">${p.desc}</div>
+        <div class="product-meta">
+          <div class="product-price">¥${p.price.toFixed(1)}<span class="original">¥${p.originalPrice.toFixed(1)}</span></div>
+          <div class="product-stock"><span class="dot"></span> 库存 ${p.stock}</div>
+        </div>
+        <div class="product-actions">
+          <button class="btn btn-outline" onclick="event.stopPropagation(); quickView(${p.id})">查看详情</button>
+          <button class="btn btn-primary" onclick="event.stopPropagation(); openOrder(${p.id})">立即购买</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+function selectCategory(el, cat) {
+  document.querySelectorAll('.category-tag').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  currentCategory = cat;
+  filterProducts();
+}
+function filterProducts() {
+  const search = document.getElementById('navSearchInput').value.toLowerCase();
+  let filtered = products;
+  if (currentCategory !== 'all') filtered = filtered.filter(p => p.category === currentCategory);
+  if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search) || p.desc.toLowerCase().includes(search));
+  renderProducts(filtered);
+}
+function handleSearch(value) { filterProducts(); }
+function openOrder(id) {
+  if (!isLoggedIn) { openAuthModal('login'); showToast('请先登录后再购买', 'info'); return; }
+  const p = products.find(x => x.id === id);
+  if (p) showToast(`🛒 已加入购物车: ${p.name}`, 'success');
+}
+function quickView(id) {
+  const p = products.find(x => x.id === id);
+  if (p) showToast(`📦 ${p.name}<br>${p.desc}<br>价格: ¥${p.price} | 库存: ${p.stock}`, 'info');
+}
+function openAuthModal(type) {
+  document.getElementById('authModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+  switchAuthTab(type);
+  const video = document.getElementById('avatarVideo');
+  if (video) video.play().catch(e => console.log('Video autoplay failed:', e));
+}
+function switchAuthTab(tab) {
+  document.getElementById('loginTab').classList.toggle('active', tab === 'login');
+  document.getElementById('registerTab').classList.toggle('active', tab === 'register');
+  document.getElementById('loginForm').classList.toggle('active', tab === 'login');
+  document.getElementById('registerForm').classList.toggle('active', tab === 'register');
+  document.getElementById('authTitle').textContent = tab === 'login' ? ' 用户登录' : '✨ 用户注册';
+}
+function handleLogin() {
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  if (!email || !password) { showToast('请填写完整信息', 'error'); return; }
+  isLoggedIn = true;
+  closeModal('authModal');
+  updateAuthUI();
+  showToast('🎉 登录成功！欢迎回来', 'success');
+}
+function handleRegister() {
+  const username = document.getElementById('regUsername').value;
+  const email = document.getElementById('regEmail').value;
+  const password = document.getElementById('regPassword').value;
+  const password2 = document.getElementById('regPassword2').value;
+  if (!username || !email || !password || !password2) { showToast('请填写完整信息', 'error'); return; }
+  if (password !== password2) { showToast('两次密码不一致', 'error'); return; }
+  if (password.length < 6) { showToast('密码至少6位', 'error'); return; }
+  isLoggedIn = true;
+  closeModal('authModal');
+  updateAuthUI();
+  showToast('🎉 注册成功！新用户赠送5元优惠券', 'success');
+}
+function updateAuthUI() {
+  const actions = document.getElementById('navActions');
+  const userInfo = document.getElementById('userInfo');
+  if (isLoggedIn) { actions.style.display = 'none'; userInfo.style.display = 'flex'; }
+  else { actions.style.display = 'flex'; userInfo.style.display = 'none'; }
+}
+function toggleUserMenu() { showToast('👤 个人中心功能开发中', 'info'); }
+function closeModal(id) {
+  const modal = document.getElementById(id);
+  if (modal) {
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+    if (id === 'authModal') { const video = document.getElementById('avatarVideo'); if (video) video.pause(); }
+  }
+}
+function showToast(msg, type) {
+  type = type || 'info';
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.innerHTML = msg;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(100px)';
+    toast.style.transition = 'all 0.3s';
+    setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
+  }, 3000);
+}
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('modal-overlay')) {
+    e.target.classList.remove('active');
+    document.body.style.overflow = '';
+    const video = document.getElementById('avatarVideo');
+    if (video) video.pause();
+  }
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.active').forEach(m => { m.classList.remove('active'); });
+    document.body.style.overflow = '';
+    const video = document.getElementById('avatarVideo');
+    if (video) video.pause();
+  }
+});
+</script>
+<script src="https://skyagent-artifacts.tiangong.cn/website_script/embed_website.min.js"></script>
+<div id="ai-watermark" style="position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; padding: 15px; background-color: #ffffff; color: #888888; font-family: Arial, sans-serif; z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); font-size: 14px;">内容由AI生成，不能保证真实</div></body>
+</html>
