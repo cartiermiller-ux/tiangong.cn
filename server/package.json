@@ -1,0 +1,22 @@
+{
+  "name": "avatar-sea-shop-server",
+  "version": "1.0.0",
+  "description": "阿凡达在海上 - 数字商品发卡平台后端",
+  "main": "app.js",
+  "scripts": {
+    "start": "node --experimental-sqlite app.js",
+    "dev": "node --experimental-sqlite --watch app.js",
+    "init-db": "node --experimental-sqlite init-db.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "nodemailer": "^6.9.14",
+    "alipay-sdk": "^4.9.0",
+    "axios": "^1.7.2",
+    "uuid": "^9.0.1"
+  }
+}
