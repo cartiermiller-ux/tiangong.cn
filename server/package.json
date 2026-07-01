@@ -3,10 +3,14 @@
   "version": "1.0.0",
   "description": "阿凡达在海上 - 数字商品发卡平台后端",
   "main": "app.js",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "start": "node --experimental-sqlite app.js",
     "dev": "node --experimental-sqlite --watch app.js",
-    "init-db": "node --experimental-sqlite init-db.js"
+    "init-db": "node --experimental-sqlite init-db.js",
+    "railway:start": "bash ../railway-start.sh"
   },
   "dependencies": {
     "express": "^4.19.2",
