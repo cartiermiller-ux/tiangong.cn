@@ -22,5 +22,5 @@ VOLUME ["/app/data"]
 
 EXPOSE 3000
 
-# 启动命令（使用实验性 sqlite 标志）
-CMD ["node", "--experimental-sqlite", "app.js"]
+# 启动命令
+CMD ["node", "app.js"]

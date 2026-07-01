@@ -17,7 +17,7 @@ mkdir -p "$DB_DIR"
 # 如果数据库不存在，自动初始化
 if [ ! -f "${DB_PATH:-data/shop.db}" ]; then
   echo "🗄️  首次部署，初始化数据库..."
-  node --experimental-sqlite init-db.js
+  node init-db.js
   echo "✅ 数据库初始化完成"
 else
   echo "✅ 数据库已存在，跳过初始化"
@@ -25,4 +25,4 @@ fi
 
 # 启动服务
 echo "🚀 启动后端服务..."
-exec node --experimental-sqlite app.js
+exec node app.js

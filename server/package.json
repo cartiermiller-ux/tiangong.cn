@@ -7,15 +7,16 @@
     "node": ">=22.0.0"
   },
   "scripts": {
-    "start": "node --experimental-sqlite app.js",
-    "dev": "node --experimental-sqlite --watch app.js",
-    "init-db": "node --experimental-sqlite init-db.js",
+    "start": "node app.js",
+    "dev": "node --watch app.js",
+    "init-db": "node init-db.js",
     "railway:start": "bash ../railway-start.sh"
   },
   "dependencies": {
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "nodemailer": "^6.9.14",

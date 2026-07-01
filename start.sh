@@ -20,9 +20,9 @@ fi
 # 检查数据库
 if [ ! -f data/shop.db ]; then
   echo "🗄️  初始化数据库 ..."
-  node --experimental-sqlite init-db.js
+  node init-db.js
 fi
 
 # 启动服务
 echo "🚀 启动后端服务 ..."
-node --experimental-sqlite app.js
+node app.js
