@@ -99,3 +99,10 @@ Thumbs.db
 # --- Uploaded Files ---
 uploaded_files/
 
+# --- Backend data (SQLite database) ---
+server/data/
+*.db
+*.db-wal
+*.db-shm
+
+node_modules
