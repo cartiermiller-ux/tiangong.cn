@@ -1,0 +1,75 @@
+name: Deploy to Aliyun Server
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '*.md'
+      - '.github/**'
+      - '.gitignore'
+      - 'examples/**'
+      - 'supabase/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to Windows Server
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup SSH private key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p ${{ secrets.SSH_PORT || '22' }} -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+        shell: bash
+
+      - name: Package project
+        run: |
+          tar --exclude='.git' \
+              --exclude='node_modules' \
+              --exclude='server/node_modules' \
+              --exclude='server/data' \
+              --exclude='.github' \
+              --exclude='examples' \
+              --exclude='supabase' \
+              -czf /tmp/tiangong.tar.gz .
+          ls -lh /tmp/tiangong.tar.gz
+        shell: bash
+
+      - name: Upload archive to server
+        run: |
+          scp -i ~/.ssh/deploy_key \
+              -P ${{ secrets.SSH_PORT || '22' }} \
+              -o StrictHostKeyChecking=accept-new \
+              /tmp/tiangong.tar.gz \
+              ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:tiangong.tar.gz
+        shell: bash
+
+      - name: Deploy via SSH (PowerShell)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script_stop: true
+          command_timeout: 20m
+          script: |
+            powershell -Command "$ErrorActionPreference='Stop'; Set-Location $env:USERPROFILE\Desktop\tiangong.cn-main; if (Test-Path server\data) { Copy-Item -Path server\data -Destination ..\tiangong-data-backup -Recurse -Force }; Set-Location $env:USERPROFILE; tar -xzf tiangong.tar.gz -C Desktop\tiangong.cn-main; if (Test-Path ..\tiangong-data-backup) { Copy-Item -Path ..\tiangong-data-backup -Destination Desktop\tiangong.cn-main\server\data -Recurse -Force }; Set-Location Desktop\tiangong.cn-main\server; npm install --omit=dev --no-audit --no-fund --silent; node init-db.js; npx pm2 restart tiangong; Start-Sleep -Seconds 5; try { Invoke-WebRequest -Uri http://localhost:3000/api/health -UseBasicParsing -TimeoutSec 10 | Select-Object -ExpandProperty Content } catch { Write-Host ('Health check failed: ' + $_.Exception.Message); exit 1 }; Write-Host '=== DEPLOY COMPLETE ==='"
+
+      - name: Cleanup remote archive
+        if: always()
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            powershell -Command "Remove-Item -Path $env:USERPROFILE\tiangong.tar.gz -Force -ErrorAction SilentlyContinue"
