@@ -66,9 +66,10 @@ tr:hover td{background:rgba(0,212,255,.03)}
 .btn:hover{opacity:.85}
 
 /* Modal */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center}
-.modal-bg.active{display:flex}
-.modal{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px;width:480px;max-height:80vh;overflow-y:auto}
+.modal-bg{display:flex;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center;visibility:hidden;opacity:0;transition:opacity .2s,visibility .2s}
+.modal-bg.active{visibility:visible;opacity:1}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px;width:640px;max-height:85vh;overflow-y:auto;transform:translateY(16px) scale(.97);transition:transform .2s}
+.modal-bg.active .modal{transform:translateY(0) scale(1)}
 .modal h3{margin-bottom:16px;color:var(--accent)}
 .modal label{display:block;color:var(--dim);font-size:13px;margin:10px 0 4px}
 .modal input,.modal select,.modal textarea{width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none}
@@ -76,12 +77,28 @@ tr:hover td{background:rgba(0,212,255,.03)}
 .modal textarea{min-height:80px;resize:vertical}
 .modal .actions{display:flex;gap:10px;margin-top:18px;justify-content:flex-end}
 
+/* Confirm Dialog */
+.confirm-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:center;justify-content:center;visibility:hidden;opacity:0;transition:opacity .2s,visibility .2s}
+.confirm-bg.active{visibility:visible;opacity:1}
+.confirm-box{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px;width:380px;transform:scale(.92);transition:transform .2s}
+.confirm-bg.active .confirm-box{transform:scale(1)}
+.confirm-box .confirm-icon{text-align:center;font-size:36px;margin-bottom:12px}
+.confirm-box h4{text-align:center;font-size:16px;color:var(--text);margin-bottom:8px}
+.confirm-box p{text-align:center;font-size:13px;color:var(--dim);margin-bottom:22px;line-height:1.5}
+.confirm-box .confirm-actions{display:flex;gap:10px;justify-content:center}
+.confirm-box .confirm-actions button{flex:1;padding:10px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+.confirm-box .confirm-cancel{background:var(--bg3);color:var(--dim);border:1px solid var(--border)}
+.confirm-box .confirm-cancel:hover{background:rgba(255,255,255,.08)}
+.confirm-box .confirm-ok{background:linear-gradient(135deg,var(--danger),#e84357);color:#fff}
+.confirm-box .confirm-ok:hover{opacity:.85}
+.confirm-box .confirm-ok.primary{background:linear-gradient(135deg,var(--accent),var(--accent2))}
+
 /* Toast */
 .toast-c{position:fixed;top:20px;right:20px;z-index:200}
-.toast{padding:12px 20px;border-radius:10px;margin-bottom:8px;font-size:14px;animation:slideIn .3s}
-.toast-success{background:rgba(46,213,115,.15);border:1px solid var(--success);color:var(--success)}
-.toast-error{background:rgba(255,71,87,.15);border:1px solid var(--danger);color:var(--danger)}
-.toast-info{background:rgba(0,212,255,.1);border:1px solid var(--accent);color:var(--accent)}
+.toast{padding:12px 20px;border-radius:10px;margin-bottom:8px;font-size:14px;animation:slideIn .3s;display:flex;align-items:center;gap:8px;transition:opacity .3s,transform .3s}
+.toast-success{background:rgba(46,213,115,.12);border:1px solid rgba(46,213,115,.4);color:var(--success)}
+.toast-error{background:rgba(255,71,87,.12);border:1px solid rgba(255,71,87,.4);color:var(--danger)}
+.toast-info{background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.3);color:var(--accent)}
 @keyframes slideIn{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}
 
 /* Responsive */
@@ -110,6 +127,7 @@ tr:hover td{background:rgba(0,212,255,.03)}
       <a href="#" onclick="switchTab('orders',this)"><span>📋 订单管理</span></a>
       <a href="#" onclick="switchTab('users',this)"><span>👥 用户管理</span></a>
       <a href="#" onclick="switchTab('cards',this)"><span>🔑 卡密管理</span></a>
+      <a href="#" onclick="switchTab('settings',this)"><span>⚙️ 系统设置</span></a>
     </nav>
     <button class="logout" onclick="doLogout()">退出登录</button>
   </aside>
@@ -139,7 +157,7 @@ tr:hover td{background:rgba(0,212,255,.03)}
       <h2>📋 订单管理</h2>
       <div class="table-wrap">
         <div class="toolbar"><h3>全部订单</h3></div>
-        <table><thead><tr><th>订单号</th><th>商品</th><th>用户</th><th>邮箱</th><th>金额</th><th>支付</th><th>状态</th><th>时间</th></tr></thead><tbody id="orderList"></tbody></table>
+        <table><thead><tr><th>订单号</th><th>商品</th><th>用户</th><th>邮箱</th><th>金额</th><th>支付</th><th>状态</th><th>时间</th><th>操作</th></tr></thead><tbody id="orderList"></tbody></table>
       </div>
     </div>
 
@@ -165,27 +183,108 @@ tr:hover td{background:rgba(0,212,255,.03)}
         <table><thead><tr><th>ID</th><th>卡密内容</th><th>所属商品</th><th>状态</th><th>创建时间</th></tr></thead><tbody id="cardList"></tbody></table>
       </div>
     </div>
+
+    <!-- Settings -->
+    <div id="tab-settings" style="display:none">
+      <h2>⚙️ 系统设置</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <!-- Payment QR Codes -->
+        <div class="table-wrap" style="padding:20px">
+          <h3 style="font-size:15px;margin-bottom:16px;color:var(--accent)">收款码设置</h3>
+          <div style="margin-bottom:14px">
+            <label style="display:block;color:var(--dim);font-size:13px;margin-bottom:4px">支付宝收款码</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <img id="preview_alipay_qr" style="width:60px;height:60px;object-fit:contain;border-radius:6px;border:1px solid var(--border);background:var(--bg3);display:none">
+              <input id="s_alipay_qr" placeholder="图片URL或上传图片" style="flex:1;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none">
+              <label class="btn btn-outline btn-sm" style="cursor:pointer">上传<input type="file" accept="image/*" style="display:none" onchange="uploadQR(this,'alipay_qr')"></label>
+            </div>
+          </div>
+          <div style="margin-bottom:14px">
+            <label style="display:block;color:var(--dim);font-size:13px;margin-bottom:4px">微信收款码</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <img id="preview_wechat_qr" style="width:60px;height:60px;object-fit:contain;border-radius:6px;border:1px solid var(--border);background:var(--bg3);display:none">
+              <input id="s_wechat_qr" placeholder="图片URL或上传图片" style="flex:1;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none">
+              <label class="btn btn-outline btn-sm" style="cursor:pointer">上传<input type="file" accept="image/*" style="display:none" onchange="uploadQR(this,'wechat_qr')"></label>
+            </div>
+          </div>
+          <div style="margin-bottom:14px">
+            <label style="display:block;color:var(--dim);font-size:13px;margin-bottom:4px">USDT收款码</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <img id="preview_usdt_qr" style="width:60px;height:60px;object-fit:contain;border-radius:6px;border:1px solid var(--border);background:var(--bg3);display:none">
+              <input id="s_usdt_qr" placeholder="图片URL或上传图片" style="flex:1;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none">
+              <label class="btn btn-outline btn-sm" style="cursor:pointer">上传<input type="file" accept="image/*" style="display:none" onchange="uploadQR(this,'usdt_qr')"></label>
+            </div>
+          </div>
+          <div style="margin-bottom:14px">
+            <label style="display:block;color:var(--dim);font-size:13px;margin-bottom:4px">USDT 地址</label>
+            <input id="s_usdt_address" placeholder="TRC20/ERC20 地址" style="width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none">
+          </div>
+        </div>
+        <!-- Contact & Announcement -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="table-wrap" style="padding:20px">
+            <h3 style="font-size:15px;margin-bottom:16px;color:var(--accent)">客服信息</h3>
+            <div style="margin-bottom:14px">
+              <label style="display:block;color:var(--dim);font-size:13px;margin-bottom:4px">QQ</label>
+              <input id="s_customer_qq" placeholder="QQ号" style="width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none">
+            </div>
+            <div style="margin-bottom:14px">
+              <label style="display:block;color:var(--dim);font-size:13px;margin-bottom:4px">Telegram</label>
+              <input id="s_customer_tg" placeholder="@username" style="width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none">
+            </div>
+            <div style="margin-bottom:14px">
+              <label style="display:block;color:var(--dim);font-size:13px;margin-bottom:4px">微信</label>
+              <input id="s_customer_wx" placeholder="微信号" style="width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none">
+            </div>
+          </div>
+          <div class="table-wrap" style="padding:20px">
+            <h3 style="font-size:15px;margin-bottom:16px;color:var(--accent)">首页公告</h3>
+            <textarea id="s_announcement" placeholder="显示在首页顶部的公告文字" style="width:100%;min-height:80px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none;resize:vertical"></textarea>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:16px;text-align:right">
+        <button class="btn btn-primary" onclick="saveSettings()" style="padding:10px 32px;font-size:14px">保存设置</button>
+      </div>
+    </div>
   </main>
 </div>
 
 <!-- Product Modal -->
 <div class="modal-bg" id="productModal">
   <div class="modal">
-    <h3 id="productModalTitle">新增商品</h3>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3 id="productModalTitle" style="margin:0;color:var(--accent)">新增商品</h3>
+      <button onclick="closeModal('productModal')" style="background:var(--bg3);border:none;color:var(--dim);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
     <input type="hidden" id="editProductId">
     <label>商品名称</label><input id="pName" placeholder="如: Netflix 高级会员">
     <label>分类</label>
     <select id="pCategory" style="padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);width:100%">
       <option value="account">账号类</option><option value="key">卡密类</option><option value="vip">会员类</option><option value="software">软件类</option>
     </select>
-    <label>描述</label><textarea id="pDesc" placeholder="商品描述"></textarea>
+    <label>描述（简短，显示在商品卡片）</label><textarea id="pDesc" placeholder="一句话描述商品" style="min-height:40px"></textarea>
+    <label>商品详情（支持HTML，显示在详情页）</label>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:4px">支持HTML: &lt;h3&gt;标题 &lt;p&gt;段落 &lt;pre&gt;&lt;code&gt;代码 &lt;img&gt; &lt;table&gt; &lt;ul&gt;&lt;li&gt;</div>
+    <textarea id="pDetail" placeholder="<h3>商品详情</h3>&#10;<p>账号格式：账号----密码----api地址</p>&#10;<h3>使用说明</h3>&#10;<pre><code>示例API调用...</code></pre>" style="min-height:200px;font-family:monospace;font-size:12px"></textarea>
     <label>价格 (元)</label><input id="pPrice" type="number" step="0.1" placeholder="29.9">
     <label>原价 (元)</label><input id="pOriginal" type="number" step="0.1" placeholder="59.9">
     <label>标签</label>
     <select id="pBadge" style="padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);width:100%">
       <option value="hot">热卖</option><option value="new">新品</option><option value="vip">VIP</option>
     </select>
-    <label>图片URL</label><input id="pImg" placeholder="https://...">
+    <label>商品图片/视频</label>
+    <div id="pMediaBox" style="border:1px dashed var(--border);border-radius:8px;padding:12px;text-align:center;background:var(--bg3);margin-bottom:4px">
+      <img id="pImgPreview" style="max-width:100%;max-height:160px;border-radius:6px;display:none;margin:0 auto">
+      <video id="pVideoPreview" style="max-width:100%;max-height:200px;border-radius:6px;display:none;margin:0 auto" controls></video>
+      <div id="pMediaPlaceholder" style="padding:16px;color:var(--dim);font-size:13px">点击下方按钮上传图片或视频</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <label class="btn btn-outline btn-sm" style="cursor:pointer;flex:1;text-align:center">上传图片<input type="file" accept="image/*" style="display:none" onchange="uploadProductMedia(this,'image')"></label>
+      <label class="btn btn-outline btn-sm" style="cursor:pointer;flex:1;text-align:center">上传视频<input type="file" accept="video/*" style="display:none" onchange="uploadProductMedia(this,'video')"></label>
+    </div>
+    <label style="font-size:12px;color:var(--dim)">或手动输入URL</label>
+    <input id="pImg" placeholder="https://... 或 /uploads/xxx" style="font-size:12px">
     <div class="actions">
       <button class="btn btn-outline" onclick="closeModal('productModal')">取消</button>
       <button class="btn btn-primary" onclick="saveProduct()">保存</button>
@@ -204,6 +303,19 @@ tr:hover td{background:rgba(0,212,255,.03)}
     <div class="actions">
       <button class="btn btn-outline" onclick="closeModal('cardImportModal')">取消</button>
       <button class="btn btn-primary" onclick="importCards()">导入</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Dialog -->
+<div class="confirm-bg" id="confirmDialog">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirmIcon"></div>
+    <h4 id="confirmTitle"></h4>
+    <p id="confirmMsg"></p>
+    <div class="confirm-actions">
+      <button class="confirm-cancel" onclick="closeConfirm()">取消</button>
+      <button class="confirm-ok" id="confirmOkBtn" onclick="confirmOk()">确定</button>
     </div>
   </div>
 </div>
@@ -312,23 +424,27 @@ function catName(c) { return { account: '账号类', key: '卡密类', vip: '会
 function openProductModal(id) {
   document.getElementById('productModalTitle').textContent = id ? '编辑商品' : '新增商品';
   document.getElementById('editProductId').value = id || '';
-  if (!id) { ['pName','pDesc','pPrice','pOriginal','pImg'].forEach(i => document.getElementById(i).value = ''); }
+  if (!id) { ['pName','pDesc','pDetail','pPrice','pOriginal','pImg'].forEach(i => document.getElementById(i).value = ''); updateProductPreview(''); }
   document.getElementById('productModal').classList.add('active');
 }
 
-function editProduct(id) {
-  const p = products.find(x => x.id === id);
-  if (!p) return;
-  document.getElementById('editProductId').value = id;
-  document.getElementById('pName').value = p.name;
-  document.getElementById('pCategory').value = p.category;
-  document.getElementById('pDesc').value = p.desc || p.description || '';
-  document.getElementById('pPrice').value = p.price;
-  document.getElementById('pOriginal').value = p.originalPrice || p.original_price || '';
-  document.getElementById('pBadge').value = p.badge || 'hot';
-  document.getElementById('pImg').value = p.img || p.image || '';
-  document.getElementById('productModalTitle').textContent = '编辑商品';
-  document.getElementById('productModal').classList.add('active');
+async function editProduct(id) {
+  try {
+    const p = await api('/products/' + id);
+    document.getElementById('editProductId').value = id;
+    document.getElementById('pName').value = p.name;
+    document.getElementById('pCategory').value = p.category;
+    document.getElementById('pDesc').value = p.desc || '';
+    document.getElementById('pDetail').value = p.detail || '';
+    document.getElementById('pPrice').value = p.price;
+    document.getElementById('pOriginal').value = p.originalPrice || p.original_price || '';
+    document.getElementById('pBadge').value = p.badge || 'hot';
+    const imgUrl = p.img || p.image || '';
+    document.getElementById('pImg').value = imgUrl;
+    updateProductPreview(imgUrl);
+    document.getElementById('productModalTitle').textContent = '编辑商品';
+    document.getElementById('productModal').classList.add('active');
+  } catch (e) { toast('加载商品详情失败: ' + e.message, 'error'); }
 }
 
 async function saveProduct() {
@@ -337,6 +453,7 @@ async function saveProduct() {
     name: document.getElementById('pName').value,
     category: document.getElementById('pCategory').value,
     desc: document.getElementById('pDesc').value,
+    detail: document.getElementById('pDetail').value,
     price: parseFloat(document.getElementById('pPrice').value),
     originalPrice: parseFloat(document.getElementById('pOriginal').value) || null,
     badge: document.getElementById('pBadge').value,
@@ -358,7 +475,9 @@ async function saveProduct() {
 }
 
 async function deleteProduct(id) {
-  if (!confirm('确定要下架此商品吗？')) return;
+  const p = products.find(x => x.id === id);
+  const ok = await showConfirm('下架商品', `确定要下架「${p ? p.name : ''}」吗？下架后将无法购买。`, 'del');
+  if (!ok) return;
   try {
     await api('/products/' + id, { method: 'DELETE' });
     toast('商品已下架', 'success');
@@ -376,10 +495,22 @@ async function loadOrders() {
       <td>${o.product_name || '-'}</td><td>${o.username || '游客'}</td>
       <td>${o.email}</td><td>¥${o.total_amount}</td>
       <td><span class="badge badge-${o.payment_status}">${o.payment_status === 'paid' ? '已支付' : '待支付'}</span></td>
-      <td><span class="badge badge-${o.order_status === 'delivered' ? 'delivered' : 'pending'}">${o.order_status === 'delivered' ? '已发货' : '待处理'}</span></td>
-      <td>${o.created_at}</td></tr>
+      <td><span class="badge badge-${o.order_status === 'delivered' ? 'delivered' : 'pending'}">${o.order_status === 'delivered' ? '已发货' : o.order_status === 'paid' ? '待发货' : '待处理'}</span></td>
+      <td>${o.created_at}</td>
+      <td>${o.payment_status !== 'paid' ? `<button class="btn btn-primary btn-sm" onclick="confirmOrder(${o.id}, '${o.order_no}')">确认发货</button>` : '-'}</td></tr>
     `).join('');
   } catch (e) { toast('加载订单失败', 'error'); }
+}
+
+async function confirmOrder(id, orderNo) {
+  const ok = await showConfirm('确认发货', `确认订单 ${orderNo} 已收款，立即发货？`, 'primary');
+  if (!ok) return;
+  try {
+    await api('/admin/orders/' + id + '/confirm', { method: 'PUT' });
+    toast('已确认支付并发货', 'success');
+    loadOrders();
+    loadDashboard();
+  } catch (e) { toast(e.message, 'error'); }
 }
 
 // === Users ===
@@ -398,7 +529,8 @@ async function loadUsers() {
 
 async function toggleBan(id, status) {
   const action = status === 'active' ? '封禁' : '解封';
-  if (!confirm(`确定要${action}此用户吗？`)) return;
+  const ok = await showConfirm(`${action}用户`, `确定要${action}此用户吗？${status === 'active' ? '封禁后该用户将无法登录和购买。' : ''}`, status === 'active' ? 'del' : 'primary');
+  if (!ok) return;
   try {
     await api('/admin/users/' + id + '/ban', { method: 'PUT', body: JSON.stringify({ ban: status === 'active' }) });
     toast(`${action}成功`, 'success');
@@ -442,6 +574,92 @@ async function importCards() {
   } catch (e) { toast(e.message, 'error'); }
 }
 
+// === Settings ===
+async function loadSettings() {
+  try {
+    const s = await api('/admin/settings');
+    ['alipay_qr','wechat_qr','usdt_qr','usdt_address','customer_qq','customer_tg','customer_wx','announcement'].forEach(k => {
+      const el = document.getElementById('s_' + k);
+      if (el) el.value = s[k] || '';
+      const prev = document.getElementById('preview_' + k);
+      if (prev && s[k] && s[k].startsWith('/')) {
+        prev.src = s[k]; prev.style.display = 'block';
+      }
+    });
+  } catch (e) { toast('加载设置失败: ' + e.message, 'error'); }
+}
+
+async function saveSettings() {
+  const body = {};
+  ['alipay_qr','wechat_qr','usdt_qr','usdt_address','customer_qq','customer_tg','customer_wx','announcement'].forEach(k => {
+    const el = document.getElementById('s_' + k);
+    if (el) body[k] = el.value;
+  });
+  try {
+    await api('/admin/settings', { method: 'PUT', body: JSON.stringify(body) });
+    toast('设置已保存', 'success');
+  } catch (e) { toast('保存失败: ' + e.message, 'error'); }
+}
+
+async function uploadQR(input, key) {
+  const file = input.files[0];
+  if (!file) return;
+  const fd = new FormData();
+  fd.append('file', file);
+  try {
+    const res = await fetch(API + '/admin/upload', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token },
+      body: fd
+    });
+    const data = await res.json();
+    if (data.code !== 0) throw new Error(data.message || '上传失败');
+    document.getElementById('s_' + key).value = data.data.url;
+    const prev = document.getElementById('preview_' + key);
+    if (prev) { prev.src = data.data.url; prev.style.display = 'block'; }
+    toast('上传成功', 'success');
+  } catch (e) { toast('上传失败: ' + e.message, 'error'); }
+  input.value = '';
+}
+
+async function uploadProductMedia(input, type) {
+  const file = input.files[0];
+  if (!file) return;
+  const fd = new FormData();
+  fd.append('file', file);
+  try {
+    const res = await fetch(API + '/admin/upload', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token },
+      body: fd
+    });
+    const data = await res.json();
+    if (data.code !== 0) throw new Error(data.message || '上传失败');
+    document.getElementById('pImg').value = data.data.url;
+    updateProductPreview(data.data.url);
+    toast('上传成功', 'success');
+  } catch (e) { toast('上传失败: ' + e.message, 'error'); }
+  input.value = '';
+}
+
+function updateProductPreview(url) {
+  const img = document.getElementById('pImgPreview');
+  const vid = document.getElementById('pVideoPreview');
+  const ph = document.getElementById('pMediaPlaceholder');
+  img.style.display = 'none';
+  vid.style.display = 'none';
+  vid.pause();
+  if (!url) { ph.style.display = 'block'; return; }
+  ph.style.display = 'none';
+  if (/\.(mp4|webm|ogg|mov|avi)/i.test(url)) {
+    vid.src = url;
+    vid.style.display = 'block';
+  } else {
+    img.src = url;
+    img.style.display = 'block';
+  }
+}
+
 // === Utils ===
 function switchTab(name, el) {
   document.querySelectorAll('[id^="tab-"]').forEach(t => t.style.display = 'none');
@@ -452,17 +670,47 @@ function switchTab(name, el) {
   if (name === 'orders') loadOrders();
   if (name === 'users') loadUsers();
   if (name === 'cards') loadCards();
+  if (name === 'settings') loadSettings();
 }
 
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-document.querySelectorAll('.modal-bg').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('active'); }));
+
+// === Confirm Dialog ===
+let confirmResolver = null;
+function showConfirm(title, msg, type = 'del') {
+  return new Promise(resolve => {
+    confirmResolver = resolve;
+    const icons = { del: '⚠️', primary: '❓', info: 'ℹ️' };
+    document.getElementById('confirmIcon').textContent = icons[type] || '❓';
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmMsg').textContent = msg;
+    const okBtn = document.getElementById('confirmOkBtn');
+    okBtn.className = 'confirm-ok' + (type === 'primary' ? ' primary' : '');
+    okBtn.textContent = type === 'del' ? '确认下架' : '确定';
+    document.getElementById('confirmDialog').classList.add('active');
+  });
+}
+function closeConfirm() {
+  document.getElementById('confirmDialog').classList.remove('active');
+  if (confirmResolver) { confirmResolver(false); confirmResolver = null; }
+}
+function confirmOk() {
+  document.getElementById('confirmDialog').classList.remove('active');
+  if (confirmResolver) { confirmResolver(true); confirmResolver = null; }
+}
+document.getElementById('confirmDialog').addEventListener('click', e => { if (e.target.id === 'confirmDialog') closeConfirm(); });
 
 function toast(msg, type = 'info') {
+  const icons = { success: '✓', error: '✕', info: 'ℹ' };
   const t = document.createElement('div');
   t.className = 'toast toast-' + type;
-  t.innerHTML = msg;
+  t.innerHTML = '<span style="font-weight:700;font-size:15px">' + (icons[type] || '') + '</span><span>' + msg + '</span>';
   document.getElementById('toastC').appendChild(t);
-  setTimeout(() => t.remove(), 4000);
+  setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(80px)';
+    setTimeout(() => t.remove(), 300);
+  }, 3500);
 }
 
 // === Init ===

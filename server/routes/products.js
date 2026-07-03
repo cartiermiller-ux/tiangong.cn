@@ -26,12 +26,12 @@ router.get('/', asyncHandler(async (req, res) => {
 
 // GET /api/products/:id  商品详情
 router.get('/:id', asyncHandler(async (req, res) => {
-  const p = db.prepare(`SELECT id, name, category, description, price, original_price, badge, image,
+  const p = db.prepare(`SELECT id, name, category, description, detail, price, original_price, badge, image,
       (SELECT COUNT(*) FROM card_keys WHERE product_id = products.id AND status = 'unsold') AS stock
       FROM products WHERE id = ? AND status = 'active'`).get(req.params.id);
   if (!p) return fail(res, '商品不存在或已下架', 404, 404);
   success(res, {
-    id: p.id, name: p.name, category: p.category, desc: p.description,
+    id: p.id, name: p.name, category: p.category, desc: p.description, detail: p.detail || '',
     price: p.price, originalPrice: p.original_price, stock: p.stock,
     badge: p.badge, img: p.image,
   });
@@ -41,20 +41,20 @@ router.get('/:id', asyncHandler(async (req, res) => {
 
 // POST /api/products  新增商品
 router.post('/', auth, adminOnly, asyncHandler(async (req, res) => {
-  const { name, category, desc, price, originalPrice, badge, img } = req.body;
+  const { name, category, desc, detail, price, originalPrice, badge, img } = req.body;
   if (!name || !category || !desc || price == null) return fail(res, '缺少必填字段');
-  const r = db.prepare(`INSERT INTO products (name, category, description, price, original_price, badge, image, stock)
-    VALUES (?, ?, ?, ?, ?, ?, ?, 0)`).run(name, category, desc, price, originalPrice || null, badge || null, img || null);
+  const r = db.prepare(`INSERT INTO products (name, category, description, detail, price, original_price, badge, image, stock)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)`).run(name, category, desc, detail || '', price, originalPrice || null, badge || null, img || null);
   success(res, { id: r.lastInsertRowid }, '商品创建成功');
 }));
 
 // PUT /api/products/:id  更新商品
 router.put('/:id', auth, adminOnly, asyncHandler(async (req, res) => {
-  const { name, category, desc, price, originalPrice, badge, img, status } = req.body;
+  const { name, category, desc, detail, price, originalPrice, badge, img, status } = req.body;
   const r = db.prepare(`UPDATE products SET name=COALESCE(?,name), category=COALESCE(?,category),
-    description=COALESCE(?,description), price=COALESCE(?,price), original_price=COALESCE(?,original_price),
+    description=COALESCE(?,description), detail=COALESCE(?,detail), price=COALESCE(?,price), original_price=COALESCE(?,original_price),
     badge=COALESCE(?,badge), image=COALESCE(?,image), status=COALESCE(?,status), updated_at=CURRENT_TIMESTAMP
-    WHERE id=?`).run(name, category, desc, price, originalPrice, badge, img, status, req.params.id);
+    WHERE id=?`).run(name, category, desc, detail, price, originalPrice, badge, img, status, req.params.id);
   if (r.changes === 0) return fail(res, '商品不存在', 404, 404);
   success(res, null, '商品更新成功');
 }));

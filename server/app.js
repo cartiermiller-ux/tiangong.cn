@@ -27,11 +27,28 @@ app.use((req, _res, next) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/products', require('./routes/products'));
 app.use('/api/orders', require('./routes/orders'));
-app.use('/api/payment', require('./routes/orders')); // mock-pay / alipay/notify
 app.use('/api/admin', require('./routes/admin'));
 
 // ============ 健康检查 ============
 app.get('/api/health', (_req, res) => res.json({ ok: true, time: new Date().toISOString() }));
+
+// ============ 公开设置（前端获取收款码等） ============
+const settingsDb = require('./config/db');
+app.get('/api/settings', (_req, res) => {
+  const rows = settingsDb.prepare('SELECT key, value FROM settings').all();
+  const s = {};
+  rows.forEach(r => { s[r.key] = r.value; });
+  res.json({ code: 0, data: {
+    alipay_qr: s.alipay_qr || '',
+    wechat_qr: s.wechat_qr || '',
+    usdt_qr: s.usdt_qr || '',
+    usdt_address: s.usdt_address || '',
+    customer_qq: s.customer_qq || '834430381',
+    customer_tg: s.customer_tg || '@asd666077',
+    customer_wx: s.customer_wx || 'asd666077',
+    announcement: s.announcement || '欢迎来到阿凡达在海上，数字商品自动发卡平台。购买后即时交付，如有问题请联系在线客服。',
+  }});
+});
 
 // ============ 静态前端（可选：把 index.html 放到 ../public 由后端托管） ============
 const publicDir = path.join(__dirname, '..', 'public');

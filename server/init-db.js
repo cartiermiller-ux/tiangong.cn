@@ -93,8 +93,17 @@ CREATE INDEX IF NOT EXISTS idx_card_keys_product ON card_keys(product_id, status
 CREATE INDEX IF NOT EXISTS idx_orders_user ON orders(user_id);
 CREATE INDEX IF NOT EXISTS idx_orders_no ON orders(order_no);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(order_status, payment_status);
+
+CREATE TABLE IF NOT EXISTS settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL DEFAULT '',
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 `);
 console.log('✅ 表结构创建完成');
+
+// 迁移：添加 detail 列（如果不存在）
+try { db.exec('ALTER TABLE products ADD COLUMN detail TEXT'); console.log('✅ 添加 detail 列'); } catch (_) {}
 
 // ========== 种子数据 ==========
 // 1. 管理员账号

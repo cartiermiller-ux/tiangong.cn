@@ -46,6 +46,44 @@ router.put('/users/:id/ban', asyncHandler(async (req, res) => {
   success(res, null, status === 'banned' ? '已封禁用户' : '已解封用户');
 }));
 
+// PUT /api/admin/orders/:id/confirm  管理员手动确认支付并发货
+router.put('/orders/:id/confirm', asyncHandler(async (req, res) => {
+  const order = db.prepare('SELECT * FROM orders WHERE id = ?').get(req.params.id);
+  if (!order) return fail(res, '订单不存在', 404, 404);
+  if (order.payment_status === 'paid') return fail(res, '订单已确认过');
+
+  // 标记为已支付
+  db.prepare("UPDATE orders SET payment_status = 'paid', order_status = 'paid', trade_no = ?, paid_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
+    .run('MANUAL_' + Date.now(), order.id);
+
+  // 自动发卡
+  const cards = db.prepare("SELECT id, content FROM card_keys WHERE product_id = ? AND status = 'unsold' LIMIT ?")
+    .all(order.product_id, order.quantity);
+  if (cards.length < order.quantity) return fail(res, '库存不足，无法发货');
+
+  const updateCard = db.prepare("UPDATE card_keys SET status = 'sold', order_id = ?, sold_at = CURRENT_TIMESTAMP WHERE id = ?");
+  const insertDelivery = db.prepare("INSERT INTO delivery_records (order_id, card_key_id, content, email) VALUES (?, ?, ?, ?)");
+  const tx = db.transaction(() => {
+    for (const c of cards) {
+      updateCard.run(order.id, c.id);
+      insertDelivery.run(order.id, c.id, c.content, order.email);
+    }
+    const stock = db.prepare("SELECT COUNT(*) AS c FROM card_keys WHERE product_id = ? AND status = 'unsold'").get(order.product_id).c;
+    db.prepare('UPDATE products SET stock = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(stock, order.product_id);
+    db.prepare("UPDATE orders SET order_status = 'delivered', delivered_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(order.id);
+  });
+  tx();
+
+  // 异步发邮件
+  const product = db.prepare('SELECT name FROM products WHERE id = ?').get(order.product_id);
+  try {
+    const { sendCardDeliveryEmail } = require('../emails/mailer');
+    sendCardDeliveryEmail(order.email, order.order_no, product.name, cards.map(c => c.content)).catch(e => console.error('邮件发送失败:', e.message));
+  } catch (_) {}
+
+  success(res, null, '已确认支付并发货');
+}));
+
 // GET /api/admin/cards  卡密列表（按商品）
 router.get('/cards', asyncHandler(async (req, res) => {
   const { productId } = req.query;
@@ -56,6 +94,63 @@ router.get('/cards', asyncHandler(async (req, res) => {
   sql += ' ORDER BY ck.id DESC LIMIT 200';
   const list = db.prepare(sql).all(...params);
   success(res, list);
+}));
+
+// GET /api/admin/settings  获取所有设置项
+router.get('/settings', asyncHandler(async (req, res) => {
+  const rows = db.prepare('SELECT key, value FROM settings').all();
+  const settings = {};
+  rows.forEach(r => { settings[r.key] = r.value; });
+  // 返回所有设置项，带默认值
+  success(res, {
+    alipay_qr: settings.alipay_qr || '',
+    wechat_qr: settings.wechat_qr || '',
+    usdt_qr: settings.usdt_qr || '',
+    usdt_address: settings.usdt_address || '',
+    customer_qq: settings.customer_qq || '834430381',
+    customer_tg: settings.customer_tg || '@asd666077',
+    customer_wx: settings.customer_wx || 'asd666077',
+    announcement: settings.announcement || '欢迎来到阿凡达在海上，数字商品自动发卡平台。购买后即时交付，如有问题请联系在线客服。',
+  });
+}));
+
+// PUT /api/admin/settings  批量更新设置
+router.put('/settings', asyncHandler(async (req, res) => {
+  const upsert = db.prepare(`INSERT INTO settings (key, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)
+    ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP`);
+  const keys = ['alipay_qr', 'wechat_qr', 'usdt_qr', 'usdt_address', 'customer_qq', 'customer_tg', 'customer_wx', 'announcement'];
+  const tx = db.transaction(() => {
+    for (const k of keys) {
+      if (req.body[k] !== undefined) {
+        upsert.run(k, String(req.body[k]));
+      }
+    }
+  });
+  tx();
+  success(res, null, '设置已保存');
+}));
+
+// POST /api/admin/upload  上传图片（收款码等）
+const multer = require('multer');
+const path = require('path');
+const uploadDir = path.join(__dirname, '..', '..', 'public', 'uploads');
+const fs = require('fs');
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: uploadDir,
+    filename: (_req, file, cb) => cb(null, Date.now() + '-' + file.originalname.replace(/[^a-zA-Z0-9._-]/g, ''))
+  }),
+  limits: { fileSize: 50 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (/^(image|video)\//.test(file.mimetype)) cb(null, true);
+    else cb(new Error('只能上传图片或视频文件'));
+  }
+});
+router.post('/upload', upload.single('file'), asyncHandler(async (req, res) => {
+  if (!req.file) return fail(res, '未上传文件');
+  const url = '/uploads/' + req.file.filename;
+  success(res, { url }, '上传成功');
 }));
 
 module.exports = router;
