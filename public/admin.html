@@ -56,6 +56,7 @@ tr:hover td{background:rgba(0,212,255,.03)}
 .badge-delivered{background:rgba(0,212,255,.15);color:var(--accent)}
 .badge-active{background:rgba(46,213,115,.15);color:var(--success)}
 .badge-banned{background:rgba(255,71,87,.15);color:var(--danger)}
+.badge-closed{background:rgba(136,153,170,.15);color:var(--dim)}
 
 /* Buttons */
 .btn{padding:7px 16px;border-radius:8px;border:none;font-size:13px;cursor:pointer;font-weight:500;transition:all .2s}
@@ -490,16 +491,62 @@ async function deleteProduct(id) {
 async function loadOrders() {
   try {
     const d = await api('/admin/orders');
-    document.getElementById('orderList').innerHTML = d.list.map(o => `
-      <tr><td style="font-family:monospace;font-size:12px">${o.order_no}</td>
-      <td>${o.product_name || '-'}</td><td>${o.username || '游客'}</td>
-      <td>${o.email}</td><td>¥${o.total_amount}</td>
-      <td><span class="badge badge-${o.payment_status}">${o.payment_status === 'paid' ? '已支付' : '待支付'}</span></td>
-      <td><span class="badge badge-${o.order_status === 'delivered' ? 'delivered' : 'pending'}">${o.order_status === 'delivered' ? '已发货' : o.order_status === 'paid' ? '待发货' : '待处理'}</span></td>
-      <td>${o.created_at}</td>
-      <td>${o.payment_status !== 'paid' ? `<button class="btn btn-primary btn-sm" onclick="confirmOrder(${o.id}, '${o.order_no}')">确认发货</button>` : '-'}</td></tr>
-    `).join('');
+    document.getElementById('orderList').innerHTML = d.list.map(o => {
+      const payLabel = o.payment_status === 'paid' ? '已支付' : '待支付';
+      const payBadge = o.payment_status === 'paid' ? 'paid' : 'pending';
+      const ordLabel = o.order_status === 'delivered' ? '已发货' : o.order_status === 'paid' ? '待发货' : o.order_status === 'closed' ? '已关闭' : '待处理';
+      const ordBadge = o.order_status === 'delivered' ? 'delivered' : o.order_status === 'closed' ? 'closed' : o.order_status === 'paid' ? 'pending' : 'pending';
+
+      // 待支付订单显示倒计时
+      let countdown = '';
+      if (o.order_status === 'created' && o.payment_status === 'pending' && o.expires_at) {
+        const diff = new Date(o.expires_at).getTime() - Date.now();
+        if (diff > 0) {
+          const mm = String(Math.floor(diff / 60000)).padStart(2, '0');
+          const ss = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+          countdown = ` <span style="color:#ffc107;font-size:11px;font-family:monospace" data-expires="${o.expires_at}" id="acd-${o.id}">⏱${mm}:${ss}</span>`;
+        } else {
+          countdown = ` <span style="color:var(--danger);font-size:11px">已过期</span>`;
+        }
+      }
+
+      const actionCell = (o.payment_status !== 'paid' && o.order_status !== 'closed')
+        ? `<button class="btn btn-primary btn-sm" onclick="confirmOrder(${o.id}, '${o.order_no}')">确认发货</button>`
+        : o.order_status === 'closed' ? '<span style="color:var(--dim);font-size:11px">-</span>' : '-';
+
+      return `<tr>
+        <td style="font-family:monospace;font-size:12px">${o.order_no}</td>
+        <td>${o.product_name || '-'}</td>
+        <td>${o.username || '游客'}</td>
+        <td>${o.email}</td>
+        <td>¥${o.total_amount}</td>
+        <td><span class="badge badge-${payBadge}">${payLabel}</span>${countdown}</td>
+        <td><span class="badge badge-${ordBadge}">${ordLabel}</span></td>
+        <td>${o.created_at}</td>
+        <td>${actionCell}</td>
+      </tr>`;
+    }).join('');
+    startAdminCountdown();
   } catch (e) { toast('加载订单失败', 'error'); }
+}
+
+let adminCdTimer = null;
+function startAdminCountdown() {
+  if (adminCdTimer) clearInterval(adminCdTimer);
+  adminCdTimer = setInterval(() => {
+    document.querySelectorAll('span[data-expires]').forEach(el => {
+      const diff = new Date(el.getAttribute('data-expires')).getTime() - Date.now();
+      if (diff <= 0) {
+        el.textContent = '已过期';
+        el.style.color = 'var(--danger)';
+        el.removeAttribute('data-expires');
+        return;
+      }
+      const mm = String(Math.floor(diff / 60000)).padStart(2, '0');
+      const ss = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+      el.textContent = `⏱${mm}:${ss}`;
+    });
+  }, 1000);
 }
 
 async function confirmOrder(id, orderNo) {

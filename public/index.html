@@ -531,6 +531,13 @@
   .order-badge-pending { background: rgba(255,193,7,.15); color: #ffc107; }
   .order-badge-delivered { background: rgba(0,212,255,.15); color: var(--accent); }
   .order-badge-created { background: rgba(136,153,170,.15); color: var(--dim); }
+  .order-badge-closed { background: rgba(255,71,87,.12); color: var(--danger); }
+  .order-countdown {
+    display: inline-block; margin-left: 8px; padding: 2px 8px;
+    background: rgba(255,193,7,.12); color: #ffc107;
+    border-radius: 4px; font-size: 11px; font-family: monospace;
+  }
+  .order-countdown.expired { background: rgba(255,71,87,.12); color: var(--danger); }
   .order-card-body {
     display: flex; justify-content: space-between; align-items: flex-start;
     gap: 16px; flex-wrap: wrap;
@@ -1172,8 +1179,21 @@ async function openMyOrders() {
       const payStatus = o.payment_status === 'paid' ? '已支付' : '待支付';
       const payClass = o.payment_status === 'paid' ? 'paid' : 'pending';
       const ordStatus = o.order_status === 'delivered' ? '已发货' : o.order_status === 'paid' ? '待发货' : o.order_status === 'closed' ? '已关闭' : '待处理';
-      const ordClass = o.order_status === 'delivered' ? 'delivered' : o.order_status === 'paid' ? 'paid' : o.order_status === 'closed' ? 'created' : 'created';
+      const ordClass = o.order_status === 'delivered' ? 'delivered' : o.order_status === 'paid' ? 'paid' : o.order_status === 'closed' ? 'closed' : 'created';
       const payNames = { alipay: '支付宝', wechat: '微信', usdt: 'USDT', balance: '余额' };
+
+      // 倒计时（仅未支付的 created 订单）
+      let countdownHtml = '';
+      if (o.order_status === 'created' && o.payment_status === 'pending' && o.expires_at) {
+        const diff = new Date(o.expires_at).getTime() - Date.now();
+        if (diff > 0) {
+          const mm = String(Math.floor(diff / 60000)).padStart(2, '0');
+          const ss = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+          countdownHtml = `<span class="order-countdown" data-expires="${o.expires_at}" id="cd-${o.order_no}">⏱ ${mm}:${ss}</span>`;
+        } else {
+          countdownHtml = `<span class="order-countdown expired">已过期</span>`;
+        }
+      }
 
       let cardSection = '';
       if (o.order_status === 'delivered') {
@@ -1184,12 +1204,21 @@ async function openMyOrders() {
         </div>`;
       }
 
+      const canPay = o.payment_status !== 'paid' && o.order_status !== 'closed';
+      let actionHtml = '';
+      if (canPay) {
+        actionHtml = '<button class="btn btn-outline btn-sm" onclick="contactCS()">联系客服支付</button>';
+      } else if (o.order_status === 'closed' && o.payment_status === 'pending') {
+        actionHtml = '<span style="color:var(--danger);font-size:12px">已超时，请重新下单</span>';
+      }
+
       return `<div class="order-card">
         <div class="order-card-head">
           <span class="order-card-no" onclick="copyText('${o.order_no}')" title="点击复制订单号">${o.order_no}</span>
           <div class="order-card-status">
             <span class="order-badge order-badge-${payClass}">${payStatus}</span>
             <span class="order-badge order-badge-${ordClass}">${ordStatus}</span>
+            ${countdownHtml}
           </div>
         </div>
         <div class="order-card-body">
@@ -1201,12 +1230,15 @@ async function openMyOrders() {
             </div>
           </div>
           <div class="order-card-actions">
-            ${o.payment_status !== 'paid' ? '<button class="btn btn-outline btn-sm" onclick="contactCS()">联系客服支付</button>' : ''}
+            ${actionHtml}
           </div>
         </div>
         ${cardSection}
       </div>`;
     }).join('');
+
+    // 启动倒计时刷新
+    startOrderCountdown();
   } catch (e) {
     container.innerHTML = `<div class="orders-empty"><p>加载失败: ${e.message}</p></div>`;
   }
@@ -1247,7 +1279,29 @@ function downloadCards(orderNo) {
   URL.revokeObjectURL(a.href);
 }
 
+let orderCountdownTimer = null;
+function startOrderCountdown() {
+  if (orderCountdownTimer) clearInterval(orderCountdownTimer);
+  const tick = () => {
+    document.querySelectorAll('.order-countdown[data-expires]').forEach(el => {
+      const diff = new Date(el.getAttribute('data-expires')).getTime() - Date.now();
+      if (diff <= 0) {
+        el.textContent = '已过期';
+        el.classList.add('expired');
+        el.removeAttribute('data-expires');
+        return;
+      }
+      const mm = String(Math.floor(diff / 60000)).padStart(2, '0');
+      const ss = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+      el.textContent = `⏱ ${mm}:${ss}`;
+    });
+  };
+  tick();
+  orderCountdownTimer = setInterval(tick, 1000);
+}
+
 function closeMyOrders() {
+  if (orderCountdownTimer) { clearInterval(orderCountdownTimer); orderCountdownTimer = null; }
   document.getElementById('myOrdersPage').classList.remove('active');
   document.getElementById('productsGrid').style.display = '';
   document.querySelector('.search-bar').style.display = '';

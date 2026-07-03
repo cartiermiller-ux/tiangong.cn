@@ -70,6 +70,7 @@ CREATE TABLE IF NOT EXISTS orders (
   pay_url TEXT,                               -- 支付链接/二维码
   paid_at DATETIME,
   delivered_at DATETIME,
+  expires_at DATETIME,                            -- 订单超时自动关闭（pending 30min）
   remark TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -104,6 +105,9 @@ console.log('✅ 表结构创建完成');
 
 // 迁移：添加 detail 列（如果不存在）
 try { db.exec('ALTER TABLE products ADD COLUMN detail TEXT'); console.log('✅ 添加 detail 列'); } catch (_) {}
+
+// 迁移：添加 expires_at 列（如果不存在）—— 订单超时自动关闭
+try { db.exec('ALTER TABLE orders ADD COLUMN expires_at DATETIME'); console.log('✅ 添加 expires_at 列'); } catch (_) {}
 
 // ========== 种子数据 ==========
 // 1. 管理员账号

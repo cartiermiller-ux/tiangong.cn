@@ -61,6 +61,26 @@ app.get('*', (req, res, next) => {
   res.sendFile(path.join(publicDir, 'index.html'), err => err && next());
 });
 
+// ============ 后台任务：30 分钟超时自动关闭未支付订单 ============
+const orderDb = require('./config/db');
+const closeExpiredOrders = () => {
+  try {
+    const result = orderDb.prepare(`UPDATE orders SET order_status = 'closed', updated_at = CURRENT_TIMESTAMP
+      WHERE payment_status = 'pending' AND order_status = 'created'
+        AND expires_at IS NOT NULL AND expires_at < CURRENT_TIMESTAMP`).run();
+    if (result.changes > 0) {
+      console.log(`[scheduler] 已自动关闭 ${result.changes} 个超时未支付订单`);
+    }
+  } catch (e) {
+    console.error('[scheduler] 关闭过期订单失败:', e.message);
+  }
+};
+// 启动时立即扫一次 + 每 60s 扫一次
+closeExpiredOrders();
+const EXPIRE_TIMER = setInterval(closeExpiredOrders, 60 * 1000);
+process.on('SIGTERM', () => clearInterval(EXPIRE_TIMER));
+process.on('SIGINT', () => clearInterval(EXPIRE_TIMER));
+
 // ============ 404 ============
 app.use((req, res) => fail(res, '接口不存在: ' + req.path, 404, 404));
 

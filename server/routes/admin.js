@@ -51,6 +51,11 @@ router.put('/orders/:id/confirm', asyncHandler(async (req, res) => {
   const order = db.prepare('SELECT * FROM orders WHERE id = ?').get(req.params.id);
   if (!order) return fail(res, '订单不存在', 404, 404);
   if (order.payment_status === 'paid') return fail(res, '订单已确认过');
+  if (order.order_status === 'closed') return fail(res, '订单已关闭（超时或取消）');
+  if (order.expires_at && new Date(order.expires_at).getTime() < Date.now()) {
+    db.prepare("UPDATE orders SET order_status = 'closed', updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(order.id);
+    return fail(res, '订单已过期，无法确认');
+  }
 
   // 标记为已支付
   db.prepare("UPDATE orders SET payment_status = 'paid', order_status = 'paid', trade_no = ?, paid_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
