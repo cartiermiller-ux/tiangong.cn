@@ -106,7 +106,7 @@ router.get('/settings', asyncHandler(async (req, res) => {
   const rows = db.prepare('SELECT key, value FROM settings').all();
   const settings = {};
   rows.forEach(r => { settings[r.key] = r.value; });
-  // 返回所有设置项，带默认值
+  // smtp_pass 不回传明文，用 configured 标志告诉前端是否已配置
   success(res, {
     alipay_qr: settings.alipay_qr || '',
     wechat_qr: settings.wechat_qr || '',
@@ -116,6 +116,12 @@ router.get('/settings', asyncHandler(async (req, res) => {
     customer_tg: settings.customer_tg || '@asd666077',
     customer_wx: settings.customer_wx || 'asd666077',
     announcement: settings.announcement || '欢迎来到阿凡达在海上，数字商品自动发卡平台。购买后即时交付，如有问题请联系在线客服。',
+    smtp_host: settings.smtp_host || '',
+    smtp_port: settings.smtp_port || '',
+    smtp_user: settings.smtp_user || '',
+    smtp_pass: settings.smtp_pass ? '********' : '',   // 不回传明文
+    smtp_from: settings.smtp_from || '',
+    smtp_configured: !!(settings.smtp_host && settings.smtp_user && settings.smtp_pass),
   });
 }));
 
@@ -123,16 +129,38 @@ router.get('/settings', asyncHandler(async (req, res) => {
 router.put('/settings', asyncHandler(async (req, res) => {
   const upsert = db.prepare(`INSERT INTO settings (key, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)
     ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP`);
-  const keys = ['alipay_qr', 'wechat_qr', 'usdt_qr', 'usdt_address', 'customer_qq', 'customer_tg', 'customer_wx', 'announcement'];
+  const keys = ['alipay_qr', 'wechat_qr', 'usdt_qr', 'usdt_address', 'customer_qq', 'customer_tg', 'customer_wx', 'announcement',
+                'smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_from'];
+  let smtpChanged = false;
   const tx = db.transaction(() => {
     for (const k of keys) {
       if (req.body[k] !== undefined) {
+        // 密码字段占位符不覆盖（前端回传 ******** 表示未修改）
+        if (k === 'smtp_pass' && req.body[k] === '********') continue;
         upsert.run(k, String(req.body[k]));
+        if (k.startsWith('smtp_')) smtpChanged = true;
       }
     }
   });
   tx();
+  // SMTP 变更后强制刷新 transporter，下次发邮件用新配置
+  if (smtpChanged) {
+    try { require('../emails/mailer').resetTransporter(); } catch (_) {}
+  }
   success(res, null, '设置已保存');
+}));
+
+// POST /api/admin/test-email  发送测试邮件
+router.post('/test-email', asyncHandler(async (req, res) => {
+  const { to } = req.body;
+  if (!to || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to)) return fail(res, '请输入有效的测试收件邮箱');
+  const { sendTestEmail } = require('../emails/mailer');
+  try {
+    const messageId = await sendTestEmail(to);
+    success(res, { messageId }, '测试邮件已发送');
+  } catch (e) {
+    fail(res, '发送失败: ' + (e.message || e), 500, 500);
+  }
 }));
 
 // POST /api/admin/upload  上传图片（收款码等）

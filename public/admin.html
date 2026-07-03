@@ -242,6 +242,39 @@ tr:hover td{background:rgba(0,212,255,.03)}
             <h3 style="font-size:15px;margin-bottom:16px;color:var(--accent)">首页公告</h3>
             <textarea id="s_announcement" placeholder="显示在首页顶部的公告文字" style="width:100%;min-height:80px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none;resize:vertical"></textarea>
           </div>
+          <div class="table-wrap" style="padding:20px">
+            <h3 style="font-size:15px;margin-bottom:16px;color:var(--accent)">📧 邮件服务 (SMTP)</h3>
+            <div style="display:grid;grid-template-columns:1fr 80px;gap:8px;margin-bottom:10px">
+              <div>
+                <label style="display:block;color:var(--dim);font-size:13px;margin-bottom:4px">SMTP 服务器</label>
+                <input id="s_smtp_host" placeholder="smtp.gmail.com" style="width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none">
+              </div>
+              <div>
+                <label style="display:block;color:var(--dim);font-size:13px;margin-bottom:4px">端口</label>
+                <input id="s_smtp_port" placeholder="465" style="width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none">
+              </div>
+            </div>
+            <div style="margin-bottom:10px">
+              <label style="display:block;color:var(--dim);font-size:13px;margin-bottom:4px">发件邮箱账号</label>
+              <input id="s_smtp_user" placeholder="your@gmail.com" style="width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none">
+            </div>
+            <div style="margin-bottom:10px">
+              <label style="display:block;color:var(--dim);font-size:13px;margin-bottom:4px">App Password / 授权码</label>
+              <input id="s_smtp_pass" type="password" placeholder="16位应用密码" style="width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none">
+            </div>
+            <div style="margin-bottom:10px">
+              <label style="display:block;color:var(--dim);font-size:13px;margin-bottom:4px">发件人显示名</label>
+              <input id="s_smtp_from" placeholder="阿凡达在海上 <your@gmail.com>" style="width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none">
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:12px">
+              <input id="test_email_to" placeholder="测试收件邮箱" style="flex:1;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none">
+              <button class="btn btn-outline btn-sm" onclick="sendTestEmail()" style="white-space:nowrap">发送测试邮件</button>
+            </div>
+            <div style="margin-top:8px;font-size:11px;color:var(--dim);line-height:1.6">
+              Gmail 需开启 2FA 并生成 App Password：<br>
+              Google 账号 → 安全性 → 2步验证 → 应用密码 → 选“邮件”生成 16 位密码
+            </div>
+          </div>
         </div>
       </div>
       <div style="margin-top:16px;text-align:right">
@@ -622,10 +655,11 @@ async function importCards() {
 }
 
 // === Settings ===
+const SETTING_KEYS = ['alipay_qr','wechat_qr','usdt_qr','usdt_address','customer_qq','customer_tg','customer_wx','announcement','smtp_host','smtp_port','smtp_user','smtp_pass','smtp_from'];
 async function loadSettings() {
   try {
     const s = await api('/admin/settings');
-    ['alipay_qr','wechat_qr','usdt_qr','usdt_address','customer_qq','customer_tg','customer_wx','announcement'].forEach(k => {
+    SETTING_KEYS.forEach(k => {
       const el = document.getElementById('s_' + k);
       if (el) el.value = s[k] || '';
       const prev = document.getElementById('preview_' + k);
@@ -638,14 +672,30 @@ async function loadSettings() {
 
 async function saveSettings() {
   const body = {};
-  ['alipay_qr','wechat_qr','usdt_qr','usdt_address','customer_qq','customer_tg','customer_wx','announcement'].forEach(k => {
+  SETTING_KEYS.forEach(k => {
     const el = document.getElementById('s_' + k);
     if (el) body[k] = el.value;
   });
   try {
     await api('/admin/settings', { method: 'PUT', body: JSON.stringify(body) });
-    toast('设置已保存', 'success');
+    toast('设置已保存（SMTP 修改后需重启服务生效）', 'success');
   } catch (e) { toast('保存失败: ' + e.message, 'error'); }
+}
+
+async function sendTestEmail() {
+  const to = document.getElementById('test_email_to').value.trim();
+  if (!to || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to)) { toast('请输入有效的测试收件邮箱', 'error'); return; }
+  const btn = event && event.target;
+  if (btn) { btn.disabled = true; btn.textContent = '发送中...'; }
+  try {
+    const res = await api('/admin/test-email', { method: 'POST', body: JSON.stringify({ to }) });
+    toast('测试邮件已发送，请检查收件箱（含垃圾箱）', 'success');
+    console.log('Test email result:', res);
+  } catch (e) {
+    toast('发送失败: ' + e.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '发送测试邮件'; }
+  }
 }
 
 async function uploadQR(input, key) {
