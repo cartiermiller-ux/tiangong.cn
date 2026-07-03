@@ -9,7 +9,7 @@ const { sendCardDeliveryEmail } = require('../emails/mailer');
 const ORDER_EXPIRE_MINUTES = 30;
 
 // ============ 自动发卡核心逻辑 ============
-// 从库存中取出 N 个未售卡密，标记为已售并绑定订单
+// 从库存中取出 N 个未售密钥，标记为已售并绑定订单
 function deliverCards(orderId, productId, quantity) {
   const cards = db.prepare("SELECT id, content FROM card_keys WHERE product_id = ? AND status = 'unsold' LIMIT ?")
     .all(productId, quantity);
@@ -55,7 +55,7 @@ router.post('/', optionalAuth, asyncHandler(async (req, res) => {
   const product = db.prepare('SELECT * FROM products WHERE id = ? AND status = ?').get(productId, 'active');
   if (!product) return fail(res, '商品不存在或已下架', 404, 404);
 
-  // 可用库存 = 未售卡密 - 已被 pending 订单锁定
+  // 可用库存 = 未售密钥 - 已被 pending 订单锁定
   const stock = availableStock(productId);
   if (stock < qty) return fail(res, `库存不足，当前可售仅剩 ${stock} 件`);
 
@@ -74,7 +74,7 @@ router.post('/', optionalAuth, asyncHandler(async (req, res) => {
     if (!cards) return fail(res, '库存不足，已退款', 500, 500);
     // 异步发邮件
     sendCardDeliveryEmail(email, orderNo, product.name, cards).catch(e => console.error('邮件发送失败:', e.message));
-    return success(res, { orderNo, cards, totalAmount }, '支付成功，卡密已生成');
+    return success(res, { orderNo, cards, totalAmount }, '支付成功，密钥已生成');
   }
 
   // 支付宝/微信/USDT：创建待确认订单，30 分钟内未支付自动关闭

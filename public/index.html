@@ -642,7 +642,7 @@
     <div class="notice-grid">
       <div class="notice-item">
         <div class="ni-icon">⚡</div>
-        <div><b>自动发货</b>付款后系统自动发货，卡密即时到账，无需等待人工处理。</div>
+        <div><b>自动发货</b>付款后系统自动发货，商品即时到账，无需等待人工处理。</div>
       </div>
       <div class="notice-item">
         <div class="ni-icon">🔒</div>
@@ -675,7 +675,7 @@
   <div class="cats" id="categories">
     <button class="cat-btn active" onclick="selectCategory(this, 'all')">全部</button>
     <button class="cat-btn" onclick="selectCategory(this, 'account')">账号类</button>
-    <button class="cat-btn" onclick="selectCategory(this, 'key')">卡密类</button>
+    <button class="cat-btn" onclick="selectCategory(this, 'key')">密钥类</button>
     <button class="cat-btn" onclick="selectCategory(this, 'vip')">会员类</button>
     <button class="cat-btn" onclick="selectCategory(this, 'software')">软件类</button>
   </div>
@@ -720,7 +720,7 @@
         </div>
         <div class="detail-qr" id="detailQR"></div>
         <div class="detail-tip">
-          <b>购买流程：</b><br>扫码支付 → 联系客服确认 → 卡密自动发送至邮箱
+          <b>购买流程：</b><br>扫码支付 → 联系客服确认 → 商品自动发送至邮箱
         </div>
         <button class="detail-buy-btn" onclick="detailSubmit()">联系客服确认支付</button>
         <button class="detail-contact-btn" onclick="contactCS()">💬 联系客服</button>
@@ -823,7 +823,7 @@
       <div class="order-summary" id="orderSummary"></div>
       <div class="form-group">
         <label>接收邮箱</label>
-        <input type="email" placeholder="请输入邮箱地址（用于接收卡密）" id="orderEmail">
+        <input type="email" placeholder="请输入邮箱地址（用于接收商品）" id="orderEmail">
       </div>
       <div class="form-group">
         <label>购买数量</label>
@@ -862,7 +862,7 @@
       <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--dim);line-height:1.6">
         <b style="color:var(--text)">购买流程：</b><br>
         1. 扫描上方二维码完成支付<br>
-        2. 支付后联系客服确认，卡密将自动发送至您的邮箱
+        2. 支付后联系客服确认，商品将自动发送至您的邮箱
       </div>
       <button class="btn btn-primary btn-large btn-block" onclick="contactCS()" style="margin-bottom:8px">联系客服确认支付</button>
       <button class="btn btn-outline btn-block" onclick="submitOrder()" style="font-size:12px">我已完成支付，提交订单</button>
@@ -1062,7 +1062,7 @@ async function openDetail(id) {
     document.getElementById('detailTitle').textContent = p.name;
 
     // Meta
-    const catNames = { account: '账号类', key: '卡密类', vip: '会员类', software: '软件类' };
+    const catNames = { account: '账号类', key: '密钥类', vip: '会员类', software: '软件类' };
     document.getElementById('detailMeta').innerHTML = `
       <span>📁 ${catNames[p.category] || p.category}</span>
       <span>📦 库存 ${p.stock}</span>
@@ -1078,9 +1078,9 @@ async function openDetail(id) {
     }
     document.getElementById('detailPriceRow').innerHTML = priceHtml;
 
-    // Description (render as HTML)
+    // Description (render as HTML, sanitized)
     const desc = p.detail || p.desc || p.description || '<p>暂无详情</p>';
-    document.getElementById('detailContent').innerHTML = desc;
+    document.getElementById('detailContent').innerHTML = sanitizeHTML(desc);
 
     // Reset sidebar
     document.getElementById('detailQtyVal').textContent = '1';
@@ -1199,7 +1199,7 @@ async function openMyOrders() {
       if (o.order_status === 'delivered') {
         // Fetch card details for this order
         cardSection = `<div class="order-cards-section" id="cards-${o.order_no}">
-          <h4>🔑 已交付商品 <button onclick="loadOrderCards('${o.order_no}')" style="background:var(--accent);border:none;color:#fff;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:11px;margin-left:8px">查看卡密</button></h4>
+          <h4>🔑 已交付商品 <button onclick="loadOrderCards('${o.order_no}')" style="background:var(--accent);border:none;color:#fff;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:11px;margin-left:8px">查看密钥</button></h4>
           <div id="cards-content-${o.order_no}"></div>
         </div>`;
       }
@@ -1252,7 +1252,7 @@ async function loadOrderCards(orderNo) {
     const order = await api('/orders/' + orderNo);
     const cards = order.cards || [];
     if (cards.length === 0) {
-      el.innerHTML = '<div style="padding:8px;color:var(--dim);font-size:12px">暂无卡密</div>';
+      el.innerHTML = '<div style="padding:8px;color:var(--dim);font-size:12px">暂无密钥</div>';
       return;
     }
     el.innerHTML = cards.map((c, i) => `<div class="order-card-key">
@@ -1389,35 +1389,6 @@ async function submitOrder() {
   }
 }
 
-function showOrderResult(orderNo, cards, total) {
-  const cardList = cards.map((c, i) => `<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg3);border-radius:6px;margin-bottom:6px;">
-    <span style="color:var(--dim);font-size:12px;">${i + 1}.</span>
-    <code style="flex:1;color:var(--accent);font-size:13px;word-break:break-all">${c}</code>
-    <button onclick="copyText('${c}')" style="background:var(--accent);border:none;color:#fff;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px">复制</button>
-  </div>`).join('');
-  const html = `
-    <div style="text-align:center;margin-bottom:14px">
-      <div style="font-size:36px">&#10004;</div>
-      <h3 style="margin:6px 0;font-size:16px;color:var(--text)">支付成功</h3>
-      <p style="color:var(--dim);font-size:12px">订单号: ${orderNo} | 金额: ¥${total}</p>
-    </div>
-    ${cardList}
-  `;
-  const modal = document.getElementById('resultModal') || createResultModal();
-  modal.querySelector('.result-body').innerHTML = html;
-  modal.classList.add('active');
-  document.body.style.overflow = 'hidden';
-}
-
-function createResultModal() {
-  const m = document.createElement('div');
-  m.className = 'modal-overlay';
-  m.id = 'resultModal';
-  m.innerHTML = `<div class="modal" style="max-width:440px"><div class="modal-header"><h3>订单详情</h3><button class="modal-close" onclick="closeModal('resultModal')">✕</button></div><div class="modal-body result-body"></div></div>`;
-  document.body.appendChild(m);
-  m.addEventListener('click', e => { if (e.target === m) { m.classList.remove('active'); document.body.style.overflow = ''; } });
-  return m;
-}
 
 // ===== Order Query =====
 function openOrderQuery() {
@@ -1438,7 +1409,7 @@ async function queryOrder() {
     html += `<p><b>状态:</b> ${order.orderStatus || '未知'}</p>`;
     html += `<p><b>金额:</b> ¥${order.totalAmount || 0}</p>`;
     if (order.cards && order.cards.length) {
-      html += `<p style="margin-top:8px"><b>卡密:</b></p>`;
+      html += `<p style="margin-top:8px"><b>密钥:</b></p>`;
       order.cards.forEach((c, i) => {
         html += `<div style="display:flex;gap:6px;align-items:center;margin-top:4px"><code style="flex:1;font-size:12px;color:var(--accent)">${c}</code><button onclick="copyText('${c}')" style="background:var(--accent);border:none;color:#fff;padding:2px 6px;border-radius:4px;cursor:pointer;font-size:11px">复制</button></div>`;
       });
@@ -1561,6 +1532,27 @@ document.querySelectorAll('.modal-overlay').forEach(o => {
 document.addEventListener('click', e => {
   if (!e.target.closest('.user-menu')) document.getElementById('userDropdown').classList.remove('show');
 });
+
+// ===== HTML Sanitizer =====
+function sanitizeHTML(html) {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  // Remove dangerous elements
+  doc.querySelectorAll('script,iframe,object,embed,form,link,style,meta,base').forEach(el => el.remove());
+  // Remove event handler attributes (on*)
+  doc.querySelectorAll('*').forEach(el => {
+    for (const attr of [...el.attributes]) {
+      if (/^on/i.test(attr.name)) el.removeAttribute(attr.name);
+      // Block javascript: URLs in href/src/action
+      if (['href','src','action','xlink:href'].includes(attr.name.toLowerCase())) {
+        const val = attr.value.trim().toLowerCase();
+        if (val.startsWith('javascript:') || val.startsWith('data:text/html')) {
+          el.removeAttribute(attr.name);
+        }
+      }
+    }
+  });
+  return doc.body.innerHTML;
+}
 
 // ===== Toast =====
 function showToast(msg, type = 'info') {

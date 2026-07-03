@@ -89,7 +89,7 @@ router.put('/orders/:id/confirm', asyncHandler(async (req, res) => {
   success(res, null, '已确认支付并发货');
 }));
 
-// GET /api/admin/cards  卡密列表（按商品）
+// GET /api/admin/cards  密钥列表（按商品）
 router.get('/cards', asyncHandler(async (req, res) => {
   const { productId } = req.query;
   let sql = `SELECT ck.id, ck.content, ck.status, ck.created_at, ck.sold_at, p.name AS product_name

@@ -127,7 +127,7 @@ tr:hover td{background:rgba(0,212,255,.03)}
       <a href="#" onclick="switchTab('products',this)"><span>📦 商品管理</span></a>
       <a href="#" onclick="switchTab('orders',this)"><span>📋 订单管理</span></a>
       <a href="#" onclick="switchTab('users',this)"><span>👥 用户管理</span></a>
-      <a href="#" onclick="switchTab('cards',this)"><span>🔑 卡密管理</span></a>
+      <a href="#" onclick="switchTab('cards',this)"><span>🔑 密钥管理</span></a>
       <a href="#" onclick="switchTab('settings',this)"><span>⚙️ 系统设置</span></a>
     </nav>
     <button class="logout" onclick="doLogout()">退出登录</button>
@@ -173,15 +173,15 @@ tr:hover td{background:rgba(0,212,255,.03)}
 
     <!-- Cards -->
     <div id="tab-cards" style="display:none">
-      <h2>🔑 卡密管理</h2>
+      <h2>🔑 密钥管理</h2>
       <div class="table-wrap">
-        <div class="toolbar"><h3>卡密列表</h3>
+        <div class="toolbar"><h3>密钥列表</h3>
           <div style="display:flex;gap:8px">
             <select id="cardFilter" onchange="loadCards()" style="padding:6px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px"><option value="">全部商品</option></select>
             <button class="btn btn-primary" onclick="openCardImportModal()">批量导入</button>
           </div>
         </div>
-        <table><thead><tr><th>ID</th><th>卡密内容</th><th>所属商品</th><th>状态</th><th>创建时间</th></tr></thead><tbody id="cardList"></tbody></table>
+        <table><thead><tr><th>ID</th><th>密钥内容</th><th>所属商品</th><th>状态</th><th>创建时间</th></tr></thead><tbody id="cardList"></tbody></table>
       </div>
     </div>
 
@@ -295,7 +295,7 @@ tr:hover td{background:rgba(0,212,255,.03)}
     <label>商品名称</label><input id="pName" placeholder="如: Netflix 高级会员">
     <label>分类</label>
     <select id="pCategory" style="padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);width:100%">
-      <option value="account">账号类</option><option value="key">卡密类</option><option value="vip">会员类</option><option value="software">软件类</option>
+      <option value="account">账号类</option><option value="key">密钥类</option><option value="vip">会员类</option><option value="software">软件类</option>
     </select>
     <label>描述（简短，显示在商品卡片）</label><textarea id="pDesc" placeholder="一句话描述商品" style="min-height:40px"></textarea>
     <label>商品详情（支持HTML，显示在详情页）</label>
@@ -329,10 +329,10 @@ tr:hover td{background:rgba(0,212,255,.03)}
 <!-- Card Import Modal -->
 <div class="modal-bg" id="cardImportModal">
   <div class="modal">
-    <h3>批量导入卡密</h3>
+    <h3>批量导入密钥</h3>
     <label>选择商品</label>
     <select id="importProductId" style="padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);width:100%"></select>
-    <label>卡密列表 (每行一个)</label>
+    <label>密钥列表 (每行一个)</label>
     <textarea id="importCards" placeholder="CARD-KEY-001&#10;CARD-KEY-002&#10;CARD-KEY-003" style="min-height:150px"></textarea>
     <div class="actions">
       <button class="btn btn-outline" onclick="closeModal('cardImportModal')">取消</button>
@@ -420,8 +420,8 @@ async function loadDashboard() {
       <div class="stat-card"><div class="label">总订单</div><div class="val">${d.orders}</div></div>
       <div class="stat-card"><div class="label">已支付</div><div class="val green">${d.paidOrders}</div></div>
       <div class="stat-card"><div class="label">总收入</div><div class="val gold">¥${Number(d.revenue).toFixed(1)}</div></div>
-      <div class="stat-card"><div class="label">未售卡密</div><div class="val">${d.pendingCards}</div></div>
-      <div class="stat-card"><div class="label">已售卡密</div><div class="val green">${d.soldCards}</div></div>
+      <div class="stat-card"><div class="label">未售密钥</div><div class="val">${d.pendingCards}</div></div>
+      <div class="stat-card"><div class="label">已售密钥</div><div class="val green">${d.soldCards}</div></div>
     `;
     const orders = await api('/admin/orders');
     document.getElementById('dashOrders').innerHTML = orders.list.slice(0, 5).map(o => `
@@ -453,7 +453,7 @@ function loadProducts() {
   sel2.innerHTML = products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
 }
 
-function catName(c) { return { account: '账号类', key: '卡密类', vip: '会员类', software: '软件类' }[c] || c; }
+function catName(c) { return { account: '账号类', key: '密钥类', vip: '会员类', software: '软件类' }[c] || c; }
 
 function openProductModal(id) {
   document.getElementById('productModalTitle').textContent = id ? '编辑商品' : '新增商品';
@@ -631,7 +631,7 @@ async function loadCards() {
       <td><span class="badge badge-${c.status === 'unsold' ? 'active' : 'delivered'}">${c.status === 'unsold' ? '未售' : '已售'}</span></td>
       <td>${c.created_at || c.sold_at || '-'}</td></tr>
     `).join('');
-  } catch (e) { toast('加载卡密失败', 'error'); }
+  } catch (e) { toast('加载密钥失败', 'error'); }
 }
 
 function openCardImportModal() {
@@ -642,12 +642,12 @@ function openCardImportModal() {
 async function importCards() {
   const pid = document.getElementById('importProductId').value;
   const text = document.getElementById('importCards').value.trim();
-  if (!pid || !text) return toast('请选择商品并填写卡密', 'error');
+  if (!pid || !text) return toast('请选择商品并填写密钥', 'error');
   const cards = text.split('\n').map(s => s.trim()).filter(Boolean);
-  if (!cards.length) return toast('请填写卡密', 'error');
+  if (!cards.length) return toast('请填写密钥', 'error');
   try {
     const r = await api('/products/' + pid + '/cards', { method: 'POST', body: JSON.stringify({ cards }) });
-    toast(`成功导入 ${cards.length} 个卡密`, 'success');
+    toast(`成功导入 ${cards.length} 个密钥`, 'success');
     closeModal('cardImportModal');
     loadCards();
     loadDashboard();

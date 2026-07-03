@@ -40,11 +40,11 @@ function resetTransporter() {
   transporter = null;
 }
 
-// 发送卡密邮件
+// 发送密钥邮件
 async function sendCardDeliveryEmail(toEmail, orderNo, productName, cards) {
   const t = getTransporter();
   if (!t) {
-    console.log(`📧 [SMTP未配置] 订单 ${orderNo} 卡密（${productName}）：`, cards);
+    console.log(`📧 [SMTP未配置] 订单 ${orderNo} 密钥（${productName}）：`, cards);
     return false;
   }
   const c = loadSmtpConfig();
@@ -61,18 +61,18 @@ async function sendCardDeliveryEmail(toEmail, orderNo, productName, cards) {
     </div>
     <div style="background:#fff;padding:30px;border-radius:0 0 16px 16px;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
       <h2 style="color:#0a1628;margin:0 0 16px;font-size:18px;">✅ 订单发货成功</h2>
-      <p style="color:#333;font-size:14px;line-height:1.8;">您好，您的订单已支付成功，以下是您的卡密信息：</p>
+      <p style="color:#333;font-size:14px;line-height:1.8;">您好，您的订单已支付成功，以下是您的密钥信息：</p>
       <table style="width:100%;border-collapse:collapse;margin:16px 0;">
         <tr><td style="padding:8px 0;color:#888;font-size:13px;">订单号</td><td style="padding:8px 0;color:#333;font-size:14px;font-weight:600;">${orderNo}</td></tr>
         <tr><td style="padding:8px 0;color:#888;font-size:13px;">商品</td><td style="padding:8px 0;color:#333;font-size:14px;font-weight:600;">${escapeHtml(productName)}</td></tr>
       </table>
-      <h3 style="color:#0a1628;font-size:15px;margin:20px 0 10px;">卡密内容：</h3>
+      <h3 style="color:#0a1628;font-size:15px;margin:20px 0 10px;">密钥内容：</h3>
       <table style="width:100%;border-collapse:collapse;">
-        <tr><th style="padding:8px 12px;border:1px solid #0d2137;background:#0d2137;color:#fff;font-size:13px;text-align:left;">序号</th><th style="padding:8px 12px;border:1px solid #0d2137;background:#0d2137;color:#fff;font-size:13px;text-align:left;">卡密</th></tr>
+        <tr><th style="padding:8px 12px;border:1px solid #0d2137;background:#0d2137;color:#fff;font-size:13px;text-align:left;">序号</th><th style="padding:8px 12px;border:1px solid #0d2137;background:#0d2137;color:#fff;font-size:13px;text-align:left;">密钥</th></tr>
         ${cardList}
       </table>
       <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:12px 16px;margin:20px 0;font-size:13px;color:#856404;">
-        ⚠️ 请妥善保管您的卡密，切勿泄露给他人。如有问题请联系客服。
+        ⚠️ 请妥善保管您的密钥，切勿泄露给他人。如有问题请联系客服。
       </div>
       <p style="color:#888;font-size:12px;text-align:center;margin-top:24px;">此邮件由系统自动发送，请勿回复。<br>© 阿凡达在海上</p>
     </div>
@@ -82,7 +82,7 @@ async function sendCardDeliveryEmail(toEmail, orderNo, productName, cards) {
   const info = await t.sendMail({
     from: c.from,
     to: toEmail,
-    subject: `【阿凡达在海上】卡密发货 - ${productName}（订单${orderNo}）`,
+    subject: `【阿凡达在海上】密钥发货 - ${productName}（订单${orderNo}）`,
     html,
   });
   console.log(`📧 邮件已发送: ${toEmail} | messageId: ${info.messageId}`);
