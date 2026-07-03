@@ -36,6 +36,9 @@ app.get('/api/health', (_req, res) => res.json({ ok: true, time: new Date().toIS
 // ============ 静态前端（可选：把 index.html 放到 ../public 由后端托管） ============
 const publicDir = path.join(__dirname, '..', 'public');
 app.use(express.static(publicDir));
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(publicDir, 'admin.html'));
+});
 app.get('*', (req, res, next) => {
   if (req.path.startsWith('/api/')) return next();
   res.sendFile(path.join(publicDir, 'index.html'), err => err && next());
