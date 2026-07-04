@@ -277,6 +277,16 @@ tr:hover td{background:rgba(0,212,255,.03)}
           </div>
         </div>
       </div>
+      <!-- Category Management -->
+      <div class="table-wrap" style="padding:20px;margin-top:16px">
+        <h3 style="font-size:15px;margin-bottom:16px;color:var(--accent)">📁 分类管理</h3>
+        <div id="catList" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px"></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="newCatId" placeholder="分类ID (英文，如 ebook)" style="flex:0 0 140px;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none">
+          <input id="newCatName" placeholder="显示名称 (如 电子书)" style="flex:1;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none">
+          <button class="btn btn-primary btn-sm" onclick="addCategory()" style="white-space:nowrap">添加分类</button>
+        </div>
+      </div>
       <div style="margin-top:16px;text-align:right">
         <button class="btn btn-primary" onclick="saveSettings()" style="padding:10px 32px;font-size:14px">保存设置</button>
       </div>
@@ -295,7 +305,6 @@ tr:hover td{background:rgba(0,212,255,.03)}
     <label>商品名称</label><input id="pName" placeholder="如: Netflix 高级会员">
     <label>分类</label>
     <select id="pCategory" style="padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);width:100%">
-      <option value="account">账号类</option><option value="key">密钥类</option><option value="vip">会员类</option><option value="software">软件类</option>
     </select>
     <label>描述（简短，显示在商品卡片）</label><textarea id="pDesc" placeholder="一句话描述商品" style="min-height:40px"></textarea>
     <label>商品详情（支持HTML，显示在详情页）</label>
@@ -453,11 +462,14 @@ function loadProducts() {
   sel2.innerHTML = products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
 }
 
-function catName(c) { return { account: '账号类', key: '密钥类', vip: '会员类', software: '软件类' }[c] || c; }
+function catName(c) { return siteCategories[c] || c; }
 
 function openProductModal(id) {
   document.getElementById('productModalTitle').textContent = id ? '编辑商品' : '新增商品';
   document.getElementById('editProductId').value = id || '';
+  // Populate category select dynamically
+  const sel = document.getElementById('pCategory');
+  sel.innerHTML = Object.entries(siteCategories).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
   if (!id) { ['pName','pDesc','pDetail','pPrice','pOriginal','pImg'].forEach(i => document.getElementById(i).value = ''); updateProductPreview(''); }
   document.getElementById('productModal').classList.add('active');
 }
@@ -656,6 +668,49 @@ async function importCards() {
 
 // === Settings ===
 const SETTING_KEYS = ['alipay_qr','wechat_qr','usdt_qr','usdt_address','customer_qq','customer_tg','customer_wx','announcement','smtp_host','smtp_port','smtp_user','smtp_pass','smtp_from'];
+let siteCategories = { account: '账号类', key: '密钥类', vip: '会员类', software: '软件类' };
+
+function renderCategories() {
+  const el = document.getElementById('catList');
+  if (!el) return;
+  el.innerHTML = Object.entries(siteCategories).map(([id, name]) => `
+    <div style="display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:13px;">
+      <code style="color:var(--accent);font-size:12px">${id}</code>
+      <span style="color:var(--text)">${name}</span>
+      <button onclick="editCategory('${id}')" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;padding:0 2px" title="编辑">✏️</button>
+      <button onclick="removeCategory('${id}')" style="background:none;border:none;color:#ff4444;cursor:pointer;font-size:12px;padding:0 2px" title="删除">✕</button>
+    </div>
+  `).join('');
+}
+
+function addCategory() {
+  const id = document.getElementById('newCatId').value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
+  const name = document.getElementById('newCatName').value.trim();
+  if (!id || !name) return toast('请填写分类ID和名称', 'error');
+  if (siteCategories[id]) return toast('分类ID已存在', 'error');
+  siteCategories[id] = name;
+  renderCategories();
+  document.getElementById('newCatId').value = '';
+  document.getElementById('newCatName').value = '';
+  toast('分类已添加，点"保存设置"生效', 'success');
+}
+
+function editCategory(id) {
+  const name = prompt('修改分类名称:', siteCategories[id]);
+  if (name === null) return;
+  if (!name.trim()) return toast('名称不能为空', 'error');
+  siteCategories[id] = name.trim();
+  renderCategories();
+  toast('已修改，点"保存设置"生效', 'success');
+}
+
+function removeCategory(id) {
+  if (!confirm(`确定删除分类"${siteCategories[id]}"(${id})？已有该分类的商品不会被删除，但会显示为原始ID。`)) return;
+  delete siteCategories[id];
+  renderCategories();
+  toast('已删除，点"保存设置"生效', 'success');
+}
+
 async function loadSettings() {
   try {
     const s = await api('/admin/settings');
@@ -667,6 +722,10 @@ async function loadSettings() {
         prev.src = s[k]; prev.style.display = 'block';
       }
     });
+    if (s.categories) {
+      try { siteCategories = JSON.parse(s.categories); } catch (_) {}
+    }
+    renderCategories();
   } catch (e) { toast('加载设置失败: ' + e.message, 'error'); }
 }
 
@@ -676,9 +735,10 @@ async function saveSettings() {
     const el = document.getElementById('s_' + k);
     if (el) body[k] = el.value;
   });
+  body.categories = JSON.stringify(siteCategories);
   try {
     await api('/admin/settings', { method: 'PUT', body: JSON.stringify(body) });
-    toast('设置已保存（SMTP 修改后需重启服务生效）', 'success');
+    toast('设置已保存', 'success');
   } catch (e) { toast('保存失败: ' + e.message, 'error'); }
 }
 

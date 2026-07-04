@@ -47,6 +47,7 @@ app.get('/api/settings', (_req, res) => {
     customer_tg: s.customer_tg || '@asd666077',
     customer_wx: s.customer_wx || 'asd666077',
     announcement: s.announcement || '欢迎来到阿凡达在海上，数字商品自动发卡平台。购买后即时交付，如有问题请联系在线客服。',
+    categories: s.categories || '{"account":"账号类","key":"密钥类","vip":"会员类","software":"软件类"}',
   }});
 });
 

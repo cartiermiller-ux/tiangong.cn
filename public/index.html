@@ -672,13 +672,7 @@
   </div>
 
   <!-- Categories -->
-  <div class="cats" id="categories">
-    <button class="cat-btn active" onclick="selectCategory(this, 'all')">全部</button>
-    <button class="cat-btn" onclick="selectCategory(this, 'account')">账号类</button>
-    <button class="cat-btn" onclick="selectCategory(this, 'key')">密钥类</button>
-    <button class="cat-btn" onclick="selectCategory(this, 'vip')">会员类</button>
-    <button class="cat-btn" onclick="selectCategory(this, 'software')">软件类</button>
-  </div>
+  <div class="cats" id="categories"></div>
 
   <!-- Products -->
   <div class="products" id="productsGrid"></div>
@@ -912,6 +906,7 @@ let orderQty = 1;
 let selectedPayment = 'alipay';
 let currentUser = null;
 let siteSettings = {};
+let siteCategories = { account: '账号类', key: '密钥类', vip: '会员类', software: '软件类' };
 
 document.addEventListener('DOMContentLoaded', async () => {
   await Promise.all([loadProducts(), loadSettings()]);
@@ -919,12 +914,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ===== Settings =====
+function renderCategoryButtons() {
+  const el = document.getElementById('categories');
+  if (!el) return;
+  let html = '<button class="cat-btn active" onclick="selectCategory(this, \'all\')">全部</button>';
+  for (const [id, name] of Object.entries(siteCategories)) {
+    html += '<button class="cat-btn" onclick="selectCategory(this, \'' + id + '\')">' + name + '</button>';
+  }
+  el.innerHTML = html;
+}
+
 async function loadSettings() {
   try {
     const res = await fetch(API_BASE + '/settings');
     const data = await res.json();
     if (data.code !== 0) return;
     siteSettings = data.data;
+    if (siteSettings.categories) {
+      try { siteCategories = JSON.parse(siteSettings.categories); } catch (_) {}
+    }
+    renderCategoryButtons();
     // Update announcement
     const annText = document.querySelector('.announce-text');
     if (annText && siteSettings.announcement) annText.textContent = siteSettings.announcement;
@@ -949,7 +958,7 @@ async function loadSettings() {
         <div class="cs-time">在线时间：12:00 - 24:00</div>
       `;
     }
-  } catch (e) { /* use defaults */ }
+  } catch (e) { renderCategoryButtons(); }
 }
 
 // ===== Products =====
@@ -1062,9 +1071,8 @@ async function openDetail(id) {
     document.getElementById('detailTitle').textContent = p.name;
 
     // Meta
-    const catNames = { account: '账号类', key: '密钥类', vip: '会员类', software: '软件类' };
     document.getElementById('detailMeta').innerHTML = `
-      <span>📁 ${catNames[p.category] || p.category}</span>
+      <span>📁 ${siteCategories[p.category] || p.category}</span>
       <span>📦 库存 ${p.stock}</span>
       <span>⚡ 自动发货</span>
     `;

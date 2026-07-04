@@ -122,6 +122,7 @@ router.get('/settings', asyncHandler(async (req, res) => {
     smtp_pass: settings.smtp_pass ? '********' : '',   // 不回传明文
     smtp_from: settings.smtp_from || '',
     smtp_configured: !!(settings.smtp_host && settings.smtp_user && settings.smtp_pass),
+    categories: settings.categories || '{"account":"账号类","key":"密钥类","vip":"会员类","software":"软件类"}',
   });
 }));
 
@@ -130,7 +131,7 @@ router.put('/settings', asyncHandler(async (req, res) => {
   const upsert = db.prepare(`INSERT INTO settings (key, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)
     ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP`);
   const keys = ['alipay_qr', 'wechat_qr', 'usdt_qr', 'usdt_address', 'customer_qq', 'customer_tg', 'customer_wx', 'announcement',
-                'smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_from'];
+                'smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_from', 'categories'];
   let smtpChanged = false;
   const tx = db.transaction(() => {
     for (const k of keys) {
