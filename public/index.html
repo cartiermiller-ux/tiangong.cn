@@ -4,221 +4,302 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>阿凡达在海上 - 数字商品自动发卡平台</title>
-  <meta name="description" content="阿凡达在海上，数字商品自动发卡平台，一键购买即时交付。">
+  <meta name="description" content="阿凡达在海上，数字商品自动发卡平台，USDT支付，一键购买即时交付。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
 
   :root {
-    --bg: #0a1628;
-    --bg2: #0d2137;
-    --bg3: #112a42;
+    --bg: #06090f;
+    --bg2: #0c1220;
+    --bg3: #121c2e;
+    --bg4: #182438;
     --accent: #00d4ff;
+    --accent-rgb: 0,212,255;
     --accent2: #7b68ee;
-    --text: #e0e6ed;
-    --dim: #8899aa;
-    --border: rgba(0,212,255,.2);
+    --accent2-rgb: 123,104,238;
+    --gold: #f0b90b;
+    --text: #e8edf4;
+    --text2: #c0c8d4;
+    --dim: #6b7a8d;
+    --border: rgba(0,212,255,.12);
+    --border2: rgba(255,255,255,.06);
     --danger: #ff4757;
     --success: #2ed573;
-    --radius: 10px;
+    --warning: #ffa502;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 4px 24px rgba(0,0,0,.4);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,.5);
+    --glass: rgba(12,18,32,.85);
+    --transition: .25s cubic-bezier(.4,0,.2,1);
   }
 
   body {
-    font-family: 'Inter', -apple-system, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background: var(--bg);
     color: var(--text);
     font-size: 14px;
     line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
   }
 
-  a { color: var(--accent); text-decoration: none; }
-  a:hover { color: #33ddff; }
+  a { color: var(--accent); text-decoration: none; transition: color var(--transition); }
+  a:hover { color: #44ddff; }
 
   /* ===== Navbar ===== */
   .navbar {
     position: sticky; top: 0; z-index: 100;
-    background: rgba(10, 22, 40, 0.98);
+    background: var(--glass);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     border-bottom: 1px solid var(--border);
   }
   .nav-inner {
     max-width: 1200px; margin: 0 auto;
     display: flex; align-items: center; justify-content: space-between;
-    height: 56px; padding: 0 16px;
+    height: 60px; padding: 0 20px;
   }
   .logo {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 16px; font-weight: 700; color: var(--accent);
+    display: flex; align-items: center; gap: 10px;
+    font-size: 17px; font-weight: 700; color: var(--accent);
   }
   .logo-icon {
-    width: 32px; height: 32px;
+    width: 36px; height: 36px;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 8px; display: flex; align-items: center; justify-content: center;
-    color: #fff; font-size: 16px;
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 17px; font-weight: 800;
+    box-shadow: 0 2px 12px rgba(var(--accent-rgb),.3);
   }
-  .nav-links { display: flex; gap: 24px; list-style: none; }
-  .nav-links a { color: var(--dim); font-size: 14px; transition: color .2s; }
-  .nav-links a:hover { color: var(--accent); }
+  .nav-links { display: flex; gap: 28px; list-style: none; }
+  .nav-links a {
+    color: var(--dim); font-size: 14px; font-weight: 500;
+    transition: color var(--transition); position: relative;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -4px; left: 0; right: 0;
+    height: 2px; background: var(--accent); border-radius: 1px;
+    transform: scaleX(0); transition: transform var(--transition);
+  }
+  .nav-links a:hover::after { transform: scaleX(1); }
   .nav-btns { display: flex; gap: 8px; align-items: center; }
 
+  /* ===== Buttons ===== */
   .btn {
-    padding: 8px 18px; border-radius: 8px; font-size: 13px;
+    padding: 8px 20px; border-radius: var(--radius-sm); font-size: 13px;
     font-weight: 600; cursor: pointer; border: none;
     display: inline-flex; align-items: center; gap: 6px;
-    transition: all .2s;
+    transition: all var(--transition); position: relative; overflow: hidden;
   }
   .btn-outline {
     background: transparent; border: 1px solid var(--border); color: var(--accent);
   }
-  .btn-outline:hover { border-color: var(--accent); background: rgba(0,212,255,.06); }
+  .btn-outline:hover { border-color: var(--accent); background: rgba(var(--accent-rgb),.08); }
   .btn-primary {
     background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff;
+    box-shadow: 0 2px 12px rgba(var(--accent-rgb),.25);
   }
-  .btn-primary:hover { opacity: 0.85; }
-  .btn-large { padding: 10px 28px; font-size: 14px; }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(var(--accent-rgb),.35); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-large { padding: 12px 28px; font-size: 14px; }
   .btn-block { width: 100%; justify-content: center; }
+  .btn-sm { padding: 5px 12px; font-size: 12px; }
 
   /* ===== Announcement ===== */
   .announce {
-    background: rgba(0,212,255,.06);
+    background: linear-gradient(90deg, rgba(var(--accent-rgb),.06), rgba(var(--accent2-rgb),.04));
     border-bottom: 1px solid var(--border);
-    padding: 10px 16px;
+    padding: 10px 20px;
   }
   .announce-inner {
     max-width: 1200px; margin: 0 auto;
     display: flex; align-items: center; gap: 10px;
-    font-size: 13px; color: var(--dim);
+    font-size: 13px; color: var(--text2);
   }
   .announce-tag {
     background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff;
     padding: 2px 10px; border-radius: 4px;
-    font-size: 12px; font-weight: 600; white-space: nowrap;
+    font-size: 11px; font-weight: 700; white-space: nowrap; letter-spacing: 1px;
   }
   .announce-text { flex: 1; }
 
   /* ===== Main Content ===== */
-  .main { max-width: 1200px; margin: 0 auto; padding: 24px 16px; }
+  .main { max-width: 1200px; margin: 0 auto; padding: 28px 20px; }
 
   /* ===== Search ===== */
   .search-bar {
-    max-width: 500px; margin: 0 auto 24px; position: relative;
+    max-width: 520px; margin: 0 auto 28px; position: relative;
   }
   .search-bar input {
-    width: 100%; padding: 10px 16px 10px 40px;
-    border: 1px solid var(--border); border-radius: 8px;
+    width: 100%; padding: 12px 16px 12px 44px;
+    border: 1px solid var(--border); border-radius: 12px;
     font-size: 14px; background: var(--bg2); color: var(--text); outline: none;
-    transition: border-color .2s, box-shadow .2s;
+    transition: all var(--transition);
   }
-  .search-bar input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,212,255,.08); }
+  .search-bar input::placeholder { color: var(--dim); }
+  .search-bar input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb),.1), 0 4px 16px rgba(0,0,0,.2);
+    background: var(--bg3);
+  }
   .search-bar .s-icon {
-    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-    color: var(--dim); font-size: 14px;
+    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+    color: var(--dim); font-size: 15px;
   }
 
   /* ===== Categories ===== */
   .cats {
     display: flex; gap: 10px; flex-wrap: wrap;
-    margin-bottom: 20px; justify-content: center;
+    margin-bottom: 24px; justify-content: center;
   }
   .cat-btn {
-    padding: 6px 16px; border-radius: 20px;
-    font-size: 13px; cursor: pointer;
+    padding: 7px 18px; border-radius: 24px;
+    font-size: 13px; font-weight: 500; cursor: pointer;
     border: 1px solid var(--border); background: var(--bg2);
-    color: var(--dim); transition: all .2s;
+    color: var(--dim); transition: all var(--transition);
   }
-  .cat-btn:hover, .cat-btn.active {
-    background: rgba(0,212,255,.1); color: var(--accent); border-color: var(--accent);
+  .cat-btn:hover { color: var(--accent); border-color: rgba(var(--accent-rgb),.4); background: rgba(var(--accent-rgb),.06); }
+  .cat-btn.active {
+    background: linear-gradient(135deg, rgba(var(--accent-rgb),.15), rgba(var(--accent2-rgb),.1));
+    color: var(--accent); border-color: var(--accent);
+    box-shadow: 0 0 12px rgba(var(--accent-rgb),.15);
   }
 
   /* ===== Product Grid ===== */
   .products {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 18px;
   }
   .p-card {
     background: var(--bg2); border-radius: var(--radius);
     border: 1px solid var(--border);
-    overflow: hidden; transition: border-color .25s, box-shadow .25s;
+    overflow: hidden; transition: all var(--transition);
+    position: relative;
   }
-  .p-card:hover { border-color: var(--accent); box-shadow: 0 0 20px rgba(0,212,255,.08); }
+  .p-card:hover {
+    border-color: rgba(var(--accent-rgb),.4);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,.3), 0 0 0 1px rgba(var(--accent-rgb),.1);
+  }
+  .p-img-wrap {
+    position: relative; overflow: hidden;
+  }
   .p-img {
-    width: 100%; height: 160px; object-fit: cover; display: block;
-    border-bottom: 1px solid var(--border);
+    width: 100%; height: 170px; object-fit: cover; display: block;
+    transition: transform .4s ease;
   }
-  .p-info { padding: 14px; }
-  .p-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; line-height: 1.4; color: var(--text); }
-  .p-desc {
-    font-size: 12px; color: var(--dim); margin-bottom: 12px;
+  .p-card:hover .p-img { transform: scale(1.03); }
+  .p-badge {
+    position: absolute; top: 10px; left: 10px;
+    padding: 3px 10px; border-radius: 6px;
+    font-size: 11px; font-weight: 700; color: #fff;
+    backdrop-filter: blur(8px);
+  }
+  .p-badge.hot { background: rgba(255,71,87,.85); }
+  .p-badge.new { background: rgba(46,213,115,.85); }
+  .p-badge.vip { background: rgba(240,185,11,.85); }
+  .p-badge.default { background: rgba(var(--accent-rgb),.7); }
+  .p-info { padding: 16px; }
+  .p-title {
+    font-size: 14px; font-weight: 600; margin-bottom: 6px;
+    line-height: 1.5; color: var(--text);
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .p-desc {
+    font-size: 12px; color: var(--dim); margin-bottom: 14px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    line-height: 1.6;
   }
   .p-bottom {
     display: flex; align-items: center; justify-content: space-between;
   }
-  .p-price { font-size: 18px; font-weight: 700; color: var(--accent); }
-  .p-price .unit { font-size: 12px; }
-  .p-stock { font-size: 12px; color: var(--dim); }
-  .p-actions { display: flex; gap: 6px; margin-top: 12px; }
-  .p-actions .btn { flex: 1; justify-content: center; font-size: 12px; padding: 7px 0; }
+  .p-price {
+    font-size: 20px; font-weight: 800; color: var(--accent);
+    letter-spacing: -.5px;
+  }
+  .p-price .currency {
+    font-size: 12px; font-weight: 600; opacity: .7; margin-left: 3px;
+  }
+  .p-stock {
+    font-size: 11px; color: var(--dim);
+    display: flex; align-items: center; gap: 4px;
+  }
+  .p-stock .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--success);
+  }
+  .p-stock.low .dot { background: var(--warning); }
+  .p-stock.out .dot { background: var(--danger); }
+  .p-actions { display: flex; gap: 8px; margin-top: 14px; }
+  .p-actions .btn { flex: 1; justify-content: center; font-size: 12px; padding: 8px 0; }
 
   .empty-state {
-    grid-column: 1/-1; text-align: center; padding: 60px 20px;
-    color: var(--dim); font-size: 14px;
+    grid-column: 1/-1; text-align: center; padding: 80px 20px;
+    color: var(--dim); font-size: 15px;
   }
+  .empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: .5; }
 
   /* ===== Footer ===== */
   .footer {
     border-top: 1px solid var(--border);
-    padding: 24px 16px; text-align: center;
-    color: var(--dim); font-size: 12px; margin-top: 40px;
+    padding: 28px 20px; text-align: center;
+    color: var(--dim); font-size: 12px; margin-top: 48px;
     background: var(--bg2);
   }
 
   /* ===== Modal ===== */
   .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6); z-index: 200;
+    background: rgba(0,0,0,0.7); z-index: 200;
     display: flex; align-items: center; justify-content: center;
-    padding: 16px; visibility: hidden; opacity: 0; transition: opacity .25s, visibility .25s;
+    padding: 20px; visibility: hidden; opacity: 0;
+    transition: opacity .3s, visibility .3s;
+    backdrop-filter: blur(4px);
   }
   .modal-overlay.active { visibility: visible; opacity: 1; }
   .modal {
-    background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
-    width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto;
-    transform: translateY(20px) scale(.97); transition: transform .25s;
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 16px;
+    width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+    transform: translateY(20px) scale(.96); transition: transform .3s cubic-bezier(.4,0,.2,1);
+    box-shadow: var(--shadow-lg);
   }
   .modal-overlay.active .modal { transform: translateY(0) scale(1); }
   .modal-header {
-    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    padding: 18px 24px; border-bottom: 1px solid var(--border);
     display: flex; align-items: center; justify-content: space-between;
   }
-  .modal-header h3 { font-size: 16px; font-weight: 600; color: var(--accent); }
+  .modal-header h3 { font-size: 17px; font-weight: 700; color: var(--accent); }
   .modal-close {
-    width: 32px; height: 32px; background: var(--bg3); border: none;
-    border-radius: 8px; cursor: pointer; font-size: 16px; color: var(--dim);
+    width: 34px; height: 34px; background: var(--bg3); border: none;
+    border-radius: 10px; cursor: pointer; font-size: 16px; color: var(--dim);
     display: flex; align-items: center; justify-content: center;
+    transition: all var(--transition);
   }
-  .modal-close:hover { background: rgba(255,71,87,.2); color: var(--danger); }
-  .modal-body { padding: 20px; }
+  .modal-close:hover { background: rgba(255,71,87,.15); color: var(--danger); }
+  .modal-body { padding: 24px; }
 
-  .form-group { margin-bottom: 16px; }
-  .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text2); }
   .form-group input, .form-group select, .form-group textarea {
-    width: 100%; padding: 10px 12px;
-    border: 1px solid var(--border); border-radius: 8px;
+    width: 100%; padding: 11px 14px;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
     font-size: 14px; outline: none; background: var(--bg3); color: var(--text);
-    transition: border-color .2s, box-shadow .2s;
+    transition: all var(--transition);
   }
   .form-group input:focus, .form-group select:focus {
-    border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,212,255,.08);
+    border-color: var(--accent); box-shadow: 0 0 0 3px rgba(var(--accent-rgb),.1);
   }
   .form-group select option { background: var(--bg2); color: var(--text); }
 
-  .auth-tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+  .auth-tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
   .auth-tab {
-    flex: 1; padding: 10px; text-align: center; cursor: pointer;
+    flex: 1; padding: 12px; text-align: center; cursor: pointer;
     font-weight: 600; color: var(--dim); border: none; background: none;
     border-bottom: 2px solid transparent; font-size: 14px;
-    transition: color .2s, border-color .2s;
+    transition: color var(--transition), border-color var(--transition);
   }
   .auth-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
   .auth-form { display: none; }
@@ -226,64 +307,76 @@
 
   .payment-methods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .pay-method {
-    border: 1px solid var(--border); border-radius: 8px;
-    padding: 12px; text-align: center; cursor: pointer; background: var(--bg3);
-    transition: all .2s;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px; text-align: center; cursor: pointer; background: var(--bg3);
+    transition: all var(--transition);
   }
   .pay-method:hover, .pay-method.active {
-    border-color: var(--accent); background: rgba(0,212,255,.08);
+    border-color: var(--accent); background: rgba(var(--accent-rgb),.08);
+    box-shadow: 0 0 12px rgba(var(--accent-rgb),.1);
   }
-  .pay-method .icon { font-size: 20px; margin-bottom: 4px; }
-  .pay-method .name { font-size: 12px; color: var(--dim); }
+  .pay-method .icon { font-size: 22px; margin-bottom: 6px; }
+  .pay-method .name { font-size: 12px; color: var(--text2); font-weight: 500; }
 
   .order-summary {
-    background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;
-    padding: 14px; margin-bottom: 16px;
+    background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 16px; margin-bottom: 18px;
   }
-  .order-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; color: var(--dim); }
-  .order-row.total { border-top: 1px solid var(--border); margin-top: 6px; padding-top: 10px; font-weight: 700; font-size: 14px; color: var(--text); }
-  .order-row.total .price { color: var(--accent); font-size: 16px; }
+  .order-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 13px; color: var(--dim); }
+  .order-row.total { border-top: 1px solid var(--border); margin-top: 8px; padding-top: 12px; font-weight: 700; font-size: 15px; color: var(--text); }
+  .order-row.total .price { color: var(--accent); font-size: 18px; }
 
-  .qty-selector { display: flex; align-items: center; gap: 10px; }
+  .qty-selector { display: flex; align-items: center; gap: 12px; }
   .qty-btn {
-    width: 32px; height: 32px; background: var(--bg3); border: 1px solid var(--border);
-    border-radius: 6px; cursor: pointer; font-size: 16px; color: var(--text);
+    width: 34px; height: 34px; background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; cursor: pointer; font-size: 16px; color: var(--text);
     display: flex; align-items: center; justify-content: center;
+    transition: all var(--transition);
   }
   .qty-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .qty-val { font-size: 16px; font-weight: 700; min-width: 30px; text-align: center; color: var(--text); }
+  .qty-val { font-size: 16px; font-weight: 700; min-width: 36px; text-align: center; color: var(--text); }
 
   /* ===== User Menu ===== */
   .user-menu { position: relative; }
   .user-avatar {
-    width: 34px; height: 34px; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff;
-    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
     cursor: pointer; font-weight: 700; font-size: 14px;
+    box-shadow: 0 2px 8px rgba(var(--accent-rgb),.25);
+    transition: transform var(--transition);
   }
+  .user-avatar:hover { transform: scale(1.05); }
   .user-dropdown {
-    position: absolute; top: 42px; right: 0;
+    position: absolute; top: 44px; right: 0;
     background: var(--bg2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 6px; min-width: 160px;
-    display: none; box-shadow: 0 8px 24px rgba(0,0,0,.4);
-    z-index: 10;
+    border-radius: var(--radius); padding: 6px; min-width: 180px;
+    display: none; box-shadow: var(--shadow-lg); z-index: 10;
   }
   .user-dropdown.show { display: block; }
   .user-dropdown a {
     display: flex; align-items: center; gap: 8px;
-    padding: 8px 12px; color: var(--text); font-size: 13px; border-radius: 6px;
+    padding: 9px 14px; color: var(--text2); font-size: 13px; border-radius: 8px;
+    transition: background var(--transition);
   }
-  .user-dropdown a:hover { background: rgba(0,212,255,.06); }
+  .user-dropdown a:hover { background: rgba(var(--accent-rgb),.06); }
 
   /* ===== Toast ===== */
   .toast-c {
-    position: fixed; top: 70px; right: 16px; z-index: 300;
+    position: fixed; top: 72px; right: 20px; z-index: 300;
     display: flex; flex-direction: column; gap: 8px;
   }
   .toast {
     background: var(--bg2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 12px 16px;
-    box-shadow: 0 4px 16px rgba(0,0,0,.3);
-    font-size: 13px; min-width: 240px; color: var(--text);
+    border-radius: var(--radius-sm); padding: 14px 18px;
+    box-shadow: var(--shadow);
+    font-size: 13px; min-width: 260px; color: var(--text);
+    animation: toastIn .3s ease;
+  }
+  @keyframes toastIn {
+    from { transform: translateX(40px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
   }
   .toast.success { border-left: 3px solid var(--success); }
   .toast.error { border-left: 3px solid var(--danger); }
@@ -294,70 +387,72 @@
     position: fixed; right: 0; top: 50%; transform: translateY(-50%);
     z-index: 150;
     background: linear-gradient(180deg, #0e8ab8, #0a6d94); color: #fff;
-    border: none; border-radius: 10px 0 0 10px;
-    padding: 16px 8px; cursor: pointer; font-size: 13px;
+    border: none; border-radius: 12px 0 0 12px;
+    padding: 18px 10px; cursor: pointer; font-size: 13px;
     font-weight: 600; writing-mode: vertical-rl; letter-spacing: 3px;
-    box-shadow: -2px 0 12px rgba(0,120,180,.4);
+    box-shadow: -2px 0 16px rgba(0,120,180,.35);
+    transition: padding var(--transition);
   }
-  .cs-toggle:hover { padding-right: 12px; }
+  .cs-toggle:hover { padding-right: 14px; }
   .cs-panel {
-    position: fixed; right: -300px; top: 50%; transform: translateY(-50%);
-    z-index: 149; width: 280px;
+    position: fixed; right: -320px; top: 50%; transform: translateY(-50%);
+    z-index: 149; width: 290px;
     background: linear-gradient(180deg, #0e8ab8, #0a6d94);
-    border-radius: 12px 0 0 12px;
-    box-shadow: -4px 0 20px rgba(0,0,0,.3);
-    transition: right 0.3s; padding: 20px 16px;
+    border-radius: 14px 0 0 14px;
+    box-shadow: -4px 0 24px rgba(0,0,0,.35);
+    transition: right .35s cubic-bezier(.4,0,.2,1); padding: 22px 18px;
   }
   .cs-panel.open { right: 0; }
-  .cs-title { text-align: center; font-size: 15px; font-weight: 700; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,.25); color: #fff; }
+  .cs-title { text-align: center; font-size: 16px; font-weight: 700; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,.2); color: #fff; }
   .cs-item {
     display: flex; align-items: center; gap: 10px;
-    padding: 10px 12px; margin-bottom: 8px;
-    background: rgba(255,255,255,.12); border-radius: 8px;
-    color: #fff; font-size: 13px;
+    padding: 11px 14px; margin-bottom: 8px;
+    background: rgba(255,255,255,.1); border-radius: 10px;
+    color: #fff; font-size: 13px; transition: background var(--transition);
   }
-  .cs-item:hover { background: rgba(255,255,255,.22); }
+  .cs-item:hover { background: rgba(255,255,255,.2); }
   .cs-copy {
-    background: rgba(255,255,255,.2); border: none; color: #fff;
-    padding: 3px 8px; border-radius: 4px; font-size: 11px;
+    background: rgba(255,255,255,.18); border: none; color: #fff;
+    padding: 4px 10px; border-radius: 6px; font-size: 11px;
     cursor: pointer; margin-left: auto; white-space: nowrap;
+    transition: background var(--transition);
   }
-  .cs-copy:hover { background: rgba(255,255,255,.35); }
-  .cs-time { text-align: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.2); font-size: 12px; color: rgba(255,255,255,.8); }
-  .cs-toggle.shifted { right: 280px; }
+  .cs-copy:hover { background: rgba(255,255,255,.32); }
+  .cs-time { text-align: center; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.18); font-size: 12px; color: rgba(255,255,255,.7); }
+  .cs-toggle.shifted { right: 290px; }
 
   /* ===== Notice Board ===== */
   .notice-board {
     background: var(--bg2); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 20px;
-    margin-bottom: 24px;
+    border-radius: var(--radius); padding: 22px;
+    margin-bottom: 28px;
   }
   .notice-board h3 {
-    font-size: 15px; font-weight: 600; color: var(--accent);
-    margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+    font-size: 16px; font-weight: 700; color: var(--accent);
+    margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
   }
   .notice-grid {
     display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
   }
   .notice-item {
-    display: flex; align-items: flex-start; gap: 10px;
-    padding: 12px; background: var(--bg3); border-radius: 8px;
-    font-size: 13px; color: var(--dim); line-height: 1.5;
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 14px; background: var(--bg3); border-radius: 10px;
+    font-size: 13px; color: var(--dim); line-height: 1.6;
+    transition: background var(--transition);
   }
+  .notice-item:hover { background: var(--bg4); }
   .notice-item .ni-icon {
-    width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0;
+    width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
-    font-size: 14px; background: rgba(0,212,255,.1);
+    font-size: 15px; background: rgba(var(--accent-rgb),.1);
   }
-  .notice-item b { color: var(--text); display: block; margin-bottom: 2px; }
+  .notice-item b { color: var(--text); display: block; margin-bottom: 3px; font-size: 13px; }
   .notice-contact {
-    margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);
-    display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--dim);
+    margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);
+    display: flex; gap: 18px; flex-wrap: wrap; font-size: 13px; color: var(--dim);
   }
   .notice-contact span { display: flex; align-items: center; gap: 6px; }
-  .notice-contact a {
-    color: var(--accent); cursor: pointer;
-  }
+  .notice-contact a { color: var(--accent); cursor: pointer; }
   .notice-contact a:hover { text-decoration: underline; }
 
   @media (max-width: 768px) {
@@ -366,139 +461,145 @@
 
   /* ===== Product Detail Page ===== */
   .detail-page { display: none; }
-  .detail-page.active { display: block; }
+  .detail-page.active { display: block; animation: fadeUp .3s ease; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
   .detail-back {
     display: inline-flex; align-items: center; gap: 6px;
     color: var(--dim); font-size: 14px; cursor: pointer;
-    margin-bottom: 20px; padding: 6px 0; border: none; background: none;
-    transition: color .2s;
+    margin-bottom: 24px; padding: 6px 0; border: none; background: none;
+    transition: color var(--transition);
   }
   .detail-back:hover { color: var(--accent); }
   .detail-layout {
-    display: grid; grid-template-columns: 1fr 360px; gap: 24px;
+    display: grid; grid-template-columns: 1fr 380px; gap: 28px;
     align-items: start;
   }
   .detail-left { min-width: 0; }
   .detail-media {
-    width: 100%; max-height: 360px; object-fit: cover;
+    width: 100%; max-height: 400px; object-fit: cover;
     border-radius: var(--radius); border: 1px solid var(--border);
-    margin-bottom: 20px; display: block;
+    margin-bottom: 24px; display: block;
   }
   .detail-header {
     display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px;
   }
   .detail-header .badge-tag {
     background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #fff; padding: 3px 10px; border-radius: 4px;
-    font-size: 11px; font-weight: 600; white-space: nowrap; flex-shrink: 0;
+    color: #fff; padding: 4px 12px; border-radius: 6px;
+    font-size: 11px; font-weight: 700; white-space: nowrap; flex-shrink: 0;
+    letter-spacing: .5px;
   }
-  .detail-title { font-size: 20px; font-weight: 700; color: var(--text); line-height: 1.4; }
+  .detail-title { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1.4; }
   .detail-meta {
-    display: flex; gap: 16px; flex-wrap: wrap;
-    margin-bottom: 16px; font-size: 13px; color: var(--dim);
+    display: flex; gap: 18px; flex-wrap: wrap;
+    margin-bottom: 18px; font-size: 13px; color: var(--dim);
   }
-  .detail-meta span { display: flex; align-items: center; gap: 4px; }
+  .detail-meta span { display: flex; align-items: center; gap: 5px; }
   .detail-price-row {
-    display: flex; align-items: baseline; gap: 12px; margin-bottom: 20px;
-    padding: 14px 16px; background: var(--bg3); border-radius: var(--radius);
+    display: flex; align-items: baseline; gap: 14px; margin-bottom: 24px;
+    padding: 16px 20px; background: var(--bg3); border-radius: var(--radius);
     border: 1px solid var(--border);
   }
-  .detail-price { font-size: 28px; font-weight: 700; color: var(--accent); }
-  .detail-price .unit { font-size: 14px; }
+  .detail-price { font-size: 32px; font-weight: 800; color: var(--accent); letter-spacing: -.5px; }
+  .detail-price .currency { font-size: 15px; font-weight: 600; opacity: .7; margin-left: 4px; }
   .detail-orig { font-size: 14px; color: var(--dim); text-decoration: line-through; }
   .detail-discount {
-    background: rgba(255,71,87,.15); color: var(--danger);
-    padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;
+    background: rgba(255,71,87,.12); color: var(--danger);
+    padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;
   }
   .detail-content {
     background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 20px; line-height: 1.8; font-size: 14px; color: var(--text);
+    padding: 24px; line-height: 1.9; font-size: 14px; color: var(--text2);
   }
-  .detail-content h3 { color: var(--accent); font-size: 15px; margin: 16px 0 8px; }
+  .detail-content h3 { color: var(--accent); font-size: 16px; margin: 20px 0 10px; font-weight: 700; }
   .detail-content h3:first-child { margin-top: 0; }
-  .detail-content p { margin-bottom: 10px; }
+  .detail-content p { margin-bottom: 12px; }
   .detail-content code {
-    background: var(--bg3); padding: 2px 6px; border-radius: 4px;
-    font-size: 13px; color: var(--accent); font-family: monospace;
+    background: var(--bg3); padding: 2px 8px; border-radius: 4px;
+    font-size: 13px; color: var(--accent); font-family: 'JetBrains Mono', monospace;
   }
   .detail-content pre {
-    background: var(--bg3); padding: 14px; border-radius: 8px;
-    overflow-x: auto; margin: 10px 0; font-size: 13px; line-height: 1.6;
+    background: var(--bg3); padding: 16px; border-radius: 10px;
+    overflow-x: auto; margin: 12px 0; font-size: 13px; line-height: 1.7;
     border: 1px solid var(--border); color: var(--text);
   }
   .detail-content pre code { background: none; padding: 0; }
-  .detail-content img { max-width: 100%; border-radius: 8px; margin: 8px 0; }
-  .detail-content ul, .detail-content ol { padding-left: 20px; margin-bottom: 10px; }
-  .detail-content li { margin-bottom: 4px; }
+  .detail-content img { max-width: 100%; border-radius: 10px; margin: 10px 0; }
+  .detail-content ul, .detail-content ol { padding-left: 22px; margin-bottom: 12px; }
+  .detail-content li { margin-bottom: 5px; }
   .detail-content table {
-    width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px;
+    width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px;
   }
   .detail-content th, .detail-content td {
-    padding: 8px 12px; border: 1px solid var(--border); text-align: left;
+    padding: 10px 14px; border: 1px solid var(--border); text-align: left;
   }
-  .detail-content th { background: var(--bg3); color: var(--dim); font-weight: 500; }
+  .detail-content th { background: var(--bg3); color: var(--dim); font-weight: 600; }
 
   /* Detail Sidebar */
   .detail-sidebar {
-    position: sticky; top: 80px;
+    position: sticky; top: 84px;
     background: var(--bg2); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 20px;
+    border-radius: var(--radius); padding: 24px;
   }
-  .detail-sidebar h4 { font-size: 14px; color: var(--dim); margin-bottom: 12px; }
+  .detail-sidebar h4 { font-size: 13px; color: var(--dim); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
   .detail-qty {
-    display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 14px; margin-bottom: 18px;
   }
   .detail-qty button {
-    width: 34px; height: 34px; background: var(--bg3); border: 1px solid var(--border);
-    border-radius: 8px; cursor: pointer; font-size: 18px; color: var(--text);
+    width: 36px; height: 36px; background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 10px; cursor: pointer; font-size: 18px; color: var(--text);
     display: flex; align-items: center; justify-content: center;
-    transition: all .2s;
+    transition: all var(--transition);
   }
   .detail-qty button:hover { border-color: var(--accent); color: var(--accent); }
-  .detail-qty .qty-val { font-size: 18px; font-weight: 700; min-width: 40px; text-align: center; }
+  .detail-qty .qty-val { font-size: 18px; font-weight: 700; min-width: 44px; text-align: center; }
   .detail-total {
-    font-size: 13px; color: var(--dim); margin-bottom: 16px;
-    display: flex; justify-content: space-between;
+    font-size: 13px; color: var(--dim); margin-bottom: 18px;
+    display: flex; justify-content: space-between; align-items: center;
   }
-  .detail-total .amt { color: var(--accent); font-weight: 700; font-size: 16px; }
+  .detail-total .amt { color: var(--accent); font-weight: 800; font-size: 18px; }
   .detail-pay-methods {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
-    margin-bottom: 16px;
+    margin-bottom: 18px;
   }
   .detail-pay {
-    border: 1px solid var(--border); border-radius: 8px;
-    padding: 10px; text-align: center; cursor: pointer; background: var(--bg3);
-    transition: all .2s; font-size: 12px; color: var(--dim);
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px; text-align: center; cursor: pointer; background: var(--bg3);
+    transition: all var(--transition); font-size: 12px; color: var(--dim); font-weight: 500;
   }
   .detail-pay:hover, .detail-pay.active {
-    border-color: var(--accent); background: rgba(0,212,255,.08); color: var(--text);
+    border-color: var(--accent); background: rgba(var(--accent-rgb),.08); color: var(--text);
   }
-  .detail-pay .dp-icon { font-size: 18px; margin-bottom: 2px; }
+  .detail-pay .dp-icon { font-size: 20px; margin-bottom: 4px; }
   .detail-qr {
-    text-align: center; padding: 12px 0; margin-bottom: 12px;
+    text-align: center; padding: 14px 0; margin-bottom: 14px;
   }
-  .detail-qr img { max-width: 180px; max-height: 180px; border-radius: 8px; border: 1px solid var(--border); background: #fff; }
-  .detail-qr .qr-empty { padding: 16px; color: var(--dim); font-size: 12px; }
+  .detail-qr img { max-width: 180px; max-height: 180px; border-radius: 10px; border: 1px solid var(--border); background: #fff; }
+  .detail-qr .qr-empty { padding: 18px; color: var(--dim); font-size: 12px; }
   .detail-tip {
-    background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;
-    padding: 10px; font-size: 12px; color: var(--dim); line-height: 1.6;
-    margin-bottom: 14px;
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 14px; font-size: 12px; color: var(--dim); line-height: 1.7;
+    margin-bottom: 16px;
   }
   .detail-tip b { color: var(--text); }
   .detail-buy-btn {
-    width: 100%; padding: 12px; border-radius: 8px; border: none;
+    width: 100%; padding: 14px; border-radius: 10px; border: none;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #fff; font-size: 15px; font-weight: 600; cursor: pointer;
-    transition: opacity .2s; margin-bottom: 8px;
+    color: #fff; font-size: 15px; font-weight: 700; cursor: pointer;
+    transition: all var(--transition); margin-bottom: 10px;
+    box-shadow: 0 4px 16px rgba(var(--accent-rgb),.3);
   }
-  .detail-buy-btn:hover { opacity: .85; }
+  .detail-buy-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(var(--accent-rgb),.4); }
   .detail-contact-btn {
-    width: 100%; padding: 10px; border-radius: 8px;
+    width: 100%; padding: 11px; border-radius: 10px;
     border: 1px solid var(--border); background: transparent;
-    color: var(--accent); font-size: 13px; cursor: pointer;
-    transition: all .2s;
+    color: var(--accent); font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: all var(--transition);
   }
-  .detail-contact-btn:hover { border-color: var(--accent); background: rgba(0,212,255,.06); }
+  .detail-contact-btn:hover { border-color: var(--accent); background: rgba(var(--accent-rgb),.06); }
 
   @media (max-width: 900px) {
     .detail-layout { grid-template-columns: 1fr; }
@@ -507,92 +608,97 @@
 
   /* ===== My Orders Page ===== */
   .my-orders-page { display: none; }
-  .my-orders-page.active { display: block; }
+  .my-orders-page.active { display: block; animation: fadeUp .3s ease; }
   .order-card {
     background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 16px; margin-bottom: 12px; transition: border-color .2s;
+    padding: 18px; margin-bottom: 14px; transition: all var(--transition);
   }
-  .order-card:hover { border-color: rgba(0,212,255,.4); }
+  .order-card:hover { border-color: rgba(var(--accent-rgb),.3); box-shadow: 0 4px 16px rgba(0,0,0,.15); }
   .order-card-head {
     display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 10px; flex-wrap: wrap; gap: 8px;
+    margin-bottom: 12px; flex-wrap: wrap; gap: 8px;
   }
   .order-card-no {
-    font-family: monospace; font-size: 13px; color: var(--accent); cursor: pointer;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent); cursor: pointer;
   }
   .order-card-no:hover { text-decoration: underline; }
-  .order-card-status {
-    display: flex; gap: 8px; align-items: center;
-  }
+  .order-card-status { display: flex; gap: 8px; align-items: center; }
   .order-badge {
-    padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 600;
   }
-  .order-badge-paid { background: rgba(46,213,115,.15); color: var(--success); }
-  .order-badge-pending { background: rgba(255,193,7,.15); color: #ffc107; }
-  .order-badge-delivered { background: rgba(0,212,255,.15); color: var(--accent); }
-  .order-badge-created { background: rgba(136,153,170,.15); color: var(--dim); }
-  .order-badge-closed { background: rgba(255,71,87,.12); color: var(--danger); }
+  .order-badge-paid { background: rgba(46,213,115,.12); color: var(--success); }
+  .order-badge-pending { background: rgba(255,165,2,.12); color: var(--warning); }
+  .order-badge-delivered { background: rgba(var(--accent-rgb),.12); color: var(--accent); }
+  .order-badge-created { background: rgba(107,122,141,.12); color: var(--dim); }
+  .order-badge-closed { background: rgba(255,71,87,.1); color: var(--danger); }
   .order-countdown {
     display: inline-block; margin-left: 8px; padding: 2px 8px;
-    background: rgba(255,193,7,.12); color: #ffc107;
-    border-radius: 4px; font-size: 11px; font-family: monospace;
+    background: rgba(255,165,2,.1); color: var(--warning);
+    border-radius: 6px; font-size: 11px; font-family: 'JetBrains Mono', monospace;
   }
-  .order-countdown.expired { background: rgba(255,71,87,.12); color: var(--danger); }
+  .order-countdown.expired { background: rgba(255,71,87,.1); color: var(--danger); }
   .order-card-body {
     display: flex; justify-content: space-between; align-items: flex-start;
     gap: 16px; flex-wrap: wrap;
   }
   .order-card-info { flex: 1; min-width: 200px; }
-  .order-card-info .o-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-  .order-card-info .o-meta { font-size: 12px; color: var(--dim); line-height: 1.8; }
+  .order-card-info .o-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
+  .order-card-info .o-meta { font-size: 12px; color: var(--dim); line-height: 1.9; }
   .order-card-actions { display: flex; gap: 8px; flex-shrink: 0; }
   .order-cards-section {
-    margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);
+    margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);
   }
   .order-cards-section h4 {
-    font-size: 13px; color: var(--dim); margin-bottom: 8px;
+    font-size: 13px; color: var(--dim); margin-bottom: 10px;
     display: flex; align-items: center; gap: 6px;
   }
   .order-card-key {
     display: flex; align-items: center; gap: 8px;
-    padding: 8px 12px; background: var(--bg3); border-radius: 6px;
-    margin-bottom: 6px; font-size: 13px;
+    padding: 10px 14px; background: var(--bg3); border-radius: 8px;
+    margin-bottom: 8px; font-size: 13px;
   }
   .order-card-key code {
-    flex: 1; color: var(--accent); font-family: monospace;
+    flex: 1; color: var(--accent); font-family: 'JetBrains Mono', monospace;
     word-break: break-all; font-size: 12px;
   }
   .order-card-key button {
     background: var(--accent); border: none; color: #fff;
-    padding: 4px 10px; border-radius: 4px; cursor: pointer;
-    font-size: 11px; white-space: nowrap; transition: opacity .2s;
+    padding: 5px 12px; border-radius: 6px; cursor: pointer;
+    font-size: 11px; white-space: nowrap; transition: opacity var(--transition);
   }
   .order-card-key button:hover { opacity: .8; }
   .orders-empty {
-    text-align: center; padding: 60px 20px; color: var(--dim);
+    text-align: center; padding: 80px 20px; color: var(--dim);
   }
-  .orders-empty p { margin-bottom: 12px; }
+  .orders-empty p { margin-bottom: 14px; }
 
   /* ===== Scrollbar ===== */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: rgba(0,212,255,.3); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb { background: rgba(var(--accent-rgb),.25); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(var(--accent-rgb),.4); }
 
   /* ===== Mobile ===== */
   @media (max-width: 768px) {
     .nav-links { display: none; }
-    .products { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .p-img { height: 120px; }
-    .p-info { padding: 10px; }
+    .products { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .p-img { height: 130px; }
+    .p-info { padding: 12px; }
     .p-title { font-size: 13px; }
-    .p-price { font-size: 16px; }
-    .p-actions .btn { font-size: 11px; padding: 6px 0; }
-    .cs-panel { width: 240px; }
-    .cs-toggle.shifted { right: 240px; }
+    .p-price { font-size: 17px; }
+    .p-actions .btn { font-size: 11px; padding: 7px 0; }
+    .cs-panel { width: 250px; }
+    .cs-toggle.shifted { right: 250px; }
     .announce-inner { font-size: 12px; }
+    .detail-title { font-size: 18px; }
+    .detail-price { font-size: 26px; }
   }
   @media (max-width: 480px) {
     .products { grid-template-columns: 1fr; }
+    .nav-inner { height: 52px; padding: 0 14px; }
+    .logo-icon { width: 30px; height: 30px; font-size: 14px; border-radius: 8px; }
+    .logo { font-size: 15px; gap: 8px; }
+    .main { padding: 20px 14px; }
   }
 </style>
 </head>
@@ -618,7 +724,7 @@
       <div class="user-avatar" onclick="toggleUserMenu()" id="userAvatar">U</div>
       <div class="user-dropdown" id="userDropdown">
         <a href="javascript:void(0)"><span id="userName">用户</span></a>
-        <a href="javascript:void(0)">余额: <span id="userBalance">¥0.00</span></a>
+        <a href="javascript:void(0)">余额: <span id="userBalance">0.00 USDT</span></a>
         <a href="javascript:void(0)" onclick="document.getElementById('userDropdown').classList.remove('show');openMyOrders()">我的订单</a>
         <a href="javascript:void(0)" onclick="logout()">退出登录</a>
       </div>
@@ -630,7 +736,7 @@
 <div class="announce">
   <div class="announce-inner">
     <span class="announce-tag">公告</span>
-    <span class="announce-text">欢迎来到阿凡达在海上，数字商品自动发卡平台。购买后即时交付，如有问题请联系在线客服。</span>
+    <span class="announce-text">欢迎来到阿凡达在海上，数字商品自动发卡平台。支持 USDT 支付，购买后即时交付，如有问题请联系在线客服。</span>
   </div>
 </div>
 
@@ -646,15 +752,15 @@
       </div>
       <div class="notice-item">
         <div class="ni-icon">🔒</div>
-        <div><b>安全交易</b>全程加密传输，保障您的交易安全和个人隐私。</div>
+        <div><b>安全交易</b>全程加密传输，支持 USDT 匿名支付，保障您的交易安全和个人隐私。</div>
       </div>
       <div class="notice-item">
-        <div class="ni-icon">💰</div>
-        <div><b>余额充值</b>注册即送5元余额，充值无手续费，余额永久有效。</div>
+        <div class="ni-icon">💎</div>
+        <div><b>USDT 支付</b>支持 TRC20/ERC20 USDT 转账，无手续费，余额永久有效。</div>
       </div>
       <div class="notice-item">
         <div class="ni-icon">🛡️</div>
-        <div><b>售后保障</b>商品问题可联系客服处理，请在购买后5天内反馈。</div>
+        <div><b>售后保障</b>商品问题可联系客服处理，请在购买后 5 天内反馈。</div>
       </div>
     </div>
     <div class="notice-contact">
@@ -668,7 +774,7 @@
   <!-- Search -->
   <div class="search-bar">
     <span class="s-icon">🔍</span>
-    <input type="text" placeholder="搜索商品..." id="searchInput" oninput="filterProducts()">
+    <input type="text" placeholder="搜索商品名称或描述..." id="searchInput" oninput="filterProducts()">
   </div>
 
   <!-- Categories -->
@@ -694,17 +800,17 @@
       <div class="detail-sidebar" id="detailSidebar">
         <h4>购买数量</h4>
         <div class="detail-qty">
-          <button onclick="detailQty(-1)">-</button>
+          <button onclick="detailQty(-1)">−</button>
           <span class="qty-val" id="detailQtyVal">1</span>
           <button onclick="detailQty(1)">+</button>
         </div>
         <div class="detail-total">
           <span>合计</span>
-          <span class="amt" id="detailTotal">¥0.00</span>
+          <span class="amt" id="detailTotal">0.00 USDT</span>
         </div>
         <h4>接收邮箱</h4>
-        <div class="form-group" style="margin-bottom:14px">
-          <input type="email" placeholder="输入邮箱接收商品" id="detailEmail" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;outline:none;background:var(--bg3);color:var(--text);transition:border-color .2s">
+        <div class="form-group" style="margin-bottom:16px">
+          <input type="email" placeholder="输入邮箱接收商品" id="detailEmail" style="width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;outline:none;background:var(--bg3);color:var(--text);transition:all .25s">
         </div>
         <h4>支付方式</h4>
         <div class="detail-pay-methods">
@@ -725,14 +831,14 @@
   <!-- My Orders Page -->
   <div class="my-orders-page" id="myOrdersPage">
     <button class="detail-back" onclick="closeMyOrders()">← 返回商品列表</button>
-    <h2 style="font-size:20px;font-weight:700;margin-bottom:20px;color:var(--text)">📋 我的订单</h2>
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:24px;color:var(--text)">📋 我的订单</h2>
     <div id="myOrdersList"></div>
   </div>
 </div>
 
 <!-- Footer -->
 <footer class="footer">
-  <p>&copy; 2024 阿凡达在海上 | 数字商品自动发卡平台</p>
+  <p>&copy; 2024 阿凡达在海上 | 数字商品自动发卡平台 · 支持 USDT 支付</p>
 </footer>
 
 <!-- Customer Service -->
@@ -776,7 +882,7 @@
           <input type="password" placeholder="请输入密码" id="loginPassword">
         </div>
         <button class="btn btn-primary btn-large btn-block" onclick="handleLogin()">登录</button>
-        <p style="text-align:center;margin-top:12px;font-size:13px;color:var(--dim);">
+        <p style="text-align:center;margin-top:14px;font-size:13px;color:var(--dim);">
           没有账号？<a href="#" onclick="switchAuthTab('register')">立即注册</a>
         </p>
       </div>
@@ -798,7 +904,7 @@
           <input type="password" placeholder="再次输入密码" id="regPassword2">
         </div>
         <button class="btn btn-primary btn-large btn-block" onclick="handleRegister()">注册</button>
-        <p style="text-align:center;margin-top:12px;font-size:13px;color:var(--dim);">
+        <p style="text-align:center;margin-top:14px;font-size:13px;color:var(--dim);">
           已有账号？<a href="#" onclick="switchAuthTab('login')">立即登录</a>
         </p>
       </div>
@@ -822,7 +928,7 @@
       <div class="form-group">
         <label>购买数量</label>
         <div class="qty-selector">
-          <button class="qty-btn" onclick="changeQty(-1)">-</button>
+          <button class="qty-btn" onclick="changeQty(-1)">−</button>
           <span class="qty-val" id="qtyVal">1</span>
           <button class="qty-btn" onclick="changeQty(1)">+</button>
         </div>
@@ -846,19 +952,19 @@
       </div>
       <!-- QR Code Display -->
       <div id="payQRSection" style="text-align:center;padding:16px 0">
-        <img id="payQRImage" style="max-width:200px;max-height:200px;border-radius:8px;border:1px solid var(--border);background:#fff;display:none;margin:0 auto">
+        <img id="payQRImage" style="max-width:200px;max-height:200px;border-radius:10px;border:1px solid var(--border);background:#fff;display:none;margin:0 auto">
         <div id="payQRPlaceholder" style="padding:20px;color:var(--dim);font-size:13px">请管理员在后台上传收款码</div>
-        <div id="usdtAddressBox" style="display:none;margin-top:12px;padding:10px;background:var(--bg3);border-radius:8px;font-size:12px;color:var(--dim);word-break:break-all">
-          <span style="color:var(--text);font-weight:600">USDT地址：</span><span id="usdtAddrText"></span>
-          <button onclick="copyText(document.getElementById('usdtAddrText').textContent)" style="background:var(--accent);border:none;color:#fff;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;margin-left:8px">复制</button>
+        <div id="usdtAddressBox" style="display:none;margin-top:14px;padding:12px;background:var(--bg3);border-radius:10px;font-size:12px;color:var(--dim);word-break:break-all">
+          <span style="color:var(--text);font-weight:600">USDT 地址：</span><span id="usdtAddrText"></span>
+          <button onclick="copyText(document.getElementById('usdtAddrText').textContent)" style="background:var(--accent);border:none;color:#fff;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px;margin-left:8px">复制</button>
         </div>
       </div>
-      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--dim);line-height:1.6">
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:18px;font-size:13px;color:var(--dim);line-height:1.7">
         <b style="color:var(--text)">购买流程：</b><br>
         1. 扫描上方二维码完成支付<br>
         2. 支付后联系客服确认，商品将自动发送至您的邮箱
       </div>
-      <button class="btn btn-primary btn-large btn-block" onclick="contactCS()" style="margin-bottom:8px">联系客服确认支付</button>
+      <button class="btn btn-primary btn-large btn-block" onclick="contactCS()" style="margin-bottom:10px">联系客服确认支付</button>
       <button class="btn btn-outline btn-block" onclick="submitOrder()" style="font-size:12px">我已完成支付，提交订单</button>
     </div>
   </div>
@@ -877,7 +983,7 @@
         <input type="text" placeholder="请输入订单号" id="queryOrderNo">
       </div>
       <button class="btn btn-primary btn-block" onclick="queryOrder()">查询</button>
-      <div id="queryResult" style="margin-top:16px;"></div>
+      <div id="queryResult" style="margin-top:18px;"></div>
     </div>
   </div>
 </div>
@@ -896,6 +1002,14 @@ async function api(path, opts = {}) {
   const data = await res.json().catch(() => ({ code: -1, message: '网络错误' }));
   if (data.code !== 0) throw new Error(data.message || '请求失败');
   return data.data;
+}
+
+// ===== Format Helpers =====
+function formatPrice(val) {
+  return Number(val).toFixed(2) + '<span class="currency"> USDT</span>';
+}
+function formatPriceText(val) {
+  return Number(val).toFixed(2) + ' USDT';
 }
 
 // ===== State =====
@@ -934,10 +1048,8 @@ async function loadSettings() {
       try { siteCategories = JSON.parse(siteSettings.categories); } catch (_) {}
     }
     renderCategoryButtons();
-    // Update announcement
     const annText = document.querySelector('.announce-text');
     if (annText && siteSettings.announcement) annText.textContent = siteSettings.announcement;
-    // Update notice board contact
     const nc = document.querySelector('.notice-contact');
     if (nc) {
       nc.innerHTML = `
@@ -947,7 +1059,6 @@ async function loadSettings() {
         <span style="color:var(--success)">● 在线客服 12:00-24:00</span>
       `;
     }
-    // Update CS panel
     const csPanel = document.getElementById('csPanel');
     if (csPanel) {
       csPanel.innerHTML = `
@@ -980,26 +1091,37 @@ async function loadProducts(category, search) {
 function renderProducts(list) {
   const grid = document.getElementById('productsGrid');
   if (!list || list.length === 0) {
-    grid.innerHTML = '<div class="empty-state">暂无商品</div>';
+    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div>暂无商品</div>';
     return;
   }
-  grid.innerHTML = list.map(p => `
+  grid.innerHTML = list.map(p => {
+    const stockNum = Number(p.stock) || 0;
+    const stockClass = stockNum <= 0 ? 'out' : stockNum <= 5 ? 'low' : '';
+    const stockText = stockNum <= 0 ? '已售罄' : '库存 ' + stockNum;
+    const badgeNames = { hot: '热卖', new: '新品', vip: 'VIP' };
+    const badgeClass = badgeNames[p.badge] ? p.badge : 'default';
+    const badgeText = badgeNames[p.badge] || '推荐';
+
+    return `
     <div class="p-card">
-      <img class="p-img" src="${p.image || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22260%22 height=%22160%22><rect fill=%22%230d2137%22 width=%22260%22 height=%22160%22/><text x=%2250%25%22 y=%2250%25%22 fill=%22%2300d4ff%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2214%22>暂无图片</text></svg>'}" alt="${p.name}" loading="lazy">
+      <div class="p-img-wrap">
+        <img class="p-img" src="${p.image || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22270%22 height=%22170%22><rect fill=%22%230c1220%22 width=%22270%22 height=%22170%22/><text x=%2250%25%22 y=%2250%25%22 fill=%22%236b7a8d%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2214%22>暂无图片</text></svg>'}" alt="${p.name}" loading="lazy">
+        <span class="p-badge ${badgeClass}">${badgeText}</span>
+      </div>
       <div class="p-info">
         <div class="p-title">${p.name}</div>
         <div class="p-desc">${p.desc || p.description || ''}</div>
         <div class="p-bottom">
-          <div class="p-price"><span class="unit">¥</span>${Number(p.price).toFixed(2)}</div>
-          <div class="p-stock">库存 ${p.stock}</div>
+          <div class="p-price">${Number(p.price).toFixed(2)}<span class="currency"> USDT</span></div>
+          <div class="p-stock ${stockClass}"><span class="dot"></span>${stockText}</div>
         </div>
         <div class="p-actions">
           <button class="btn btn-outline" onclick="quickView(${p.id})">详情</button>
-          <button class="btn btn-primary" onclick="openOrder(${p.id})">购买</button>
+          <button class="btn btn-primary" onclick="openOrder(${p.id})" ${stockNum <= 0 ? 'disabled style="opacity:.5;cursor:not-allowed"' : ''}>购买</button>
         </div>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 async function selectCategory(el, cat) {
@@ -1022,7 +1144,6 @@ function openOrder(id) {
   orderQty = 1;
   selectedPayment = 'alipay';
   document.getElementById('qtyVal').textContent = '1';
-  // Reset payment method selection UI
   document.querySelectorAll('.pay-method').forEach((m, i) => m.classList.toggle('active', i === 0));
   updateOrderSummary();
   updateQRDisplay();
@@ -1046,7 +1167,6 @@ async function openDetail(id) {
     detailQtyNum = 1;
     detailPayMethod = 'alipay';
 
-    // Hide grid, show detail
     document.getElementById('productsGrid').style.display = 'none';
     document.querySelector('.search-bar').style.display = 'none';
     document.querySelector('.cats').style.display = 'none';
@@ -1077,11 +1197,11 @@ async function openDetail(id) {
       <span>⚡ 自动发货</span>
     `;
 
-    // Price
-    let priceHtml = `<span class="detail-price"><span class="unit">¥</span>${Number(p.price).toFixed(2)}</span>`;
+    // Price (USDT)
+    let priceHtml = `<span class="detail-price">${Number(p.price).toFixed(2)}<span class="currency"> USDT</span></span>`;
     if (p.originalPrice && p.originalPrice > p.price) {
       const disc = Math.round((1 - p.price / p.originalPrice) * 100);
-      priceHtml += `<span class="detail-orig">¥${Number(p.originalPrice).toFixed(2)}</span>`;
+      priceHtml += `<span class="detail-orig">${Number(p.originalPrice).toFixed(2)} USDT</span>`;
       priceHtml += `<span class="detail-discount">-${disc}%</span>`;
     }
     document.getElementById('detailPriceRow').innerHTML = priceHtml;
@@ -1119,7 +1239,7 @@ function detailQty(d) {
 function detailUpdateTotal() {
   if (!detailProduct) return;
   const total = (detailProduct.price * detailQtyNum).toFixed(2);
-  document.getElementById('detailTotal').textContent = '¥' + total;
+  document.getElementById('detailTotal').textContent = total + ' USDT';
 }
 
 function detailPay(el, method) {
@@ -1136,7 +1256,7 @@ function detailUpdateQR() {
   if (url) {
     let html = `<img src="${url}" alt="${detailPayMethod} QR">`;
     if (detailPayMethod === 'usdt' && siteSettings.usdt_address) {
-      html += `<div style="margin-top:8px;font-size:12px;color:var(--dim)">USDT地址: <code style="color:var(--accent);cursor:pointer" onclick="copyText('${siteSettings.usdt_address}')">${siteSettings.usdt_address}</code></div>`;
+      html += `<div style="margin-top:10px;font-size:12px;color:var(--dim)">USDT 地址: <code style="color:var(--accent);cursor:pointer" onclick="copyText('${siteSettings.usdt_address}')">${siteSettings.usdt_address}</code></div>`;
     }
     qrEl.innerHTML = html;
   } else {
@@ -1165,7 +1285,6 @@ async function detailSubmit() {
 // ===== My Orders =====
 async function openMyOrders() {
   if (!currentUser) { openAuthModal('login'); return; }
-  // Hide other sections
   document.getElementById('productsGrid').style.display = 'none';
   document.querySelector('.search-bar').style.display = 'none';
   document.querySelector('.cats').style.display = 'none';
@@ -1190,7 +1309,6 @@ async function openMyOrders() {
       const ordClass = o.order_status === 'delivered' ? 'delivered' : o.order_status === 'paid' ? 'paid' : o.order_status === 'closed' ? 'closed' : 'created';
       const payNames = { alipay: '支付宝', wechat: '微信', usdt: 'USDT', balance: '余额' };
 
-      // 倒计时（仅未支付的 created 订单）
       let countdownHtml = '';
       if (o.order_status === 'created' && o.payment_status === 'pending' && o.expires_at) {
         const diff = new Date(o.expires_at).getTime() - Date.now();
@@ -1205,9 +1323,8 @@ async function openMyOrders() {
 
       let cardSection = '';
       if (o.order_status === 'delivered') {
-        // Fetch card details for this order
         cardSection = `<div class="order-cards-section" id="cards-${o.order_no}">
-          <h4>🔑 已交付商品 <button onclick="loadOrderCards('${o.order_no}')" style="background:var(--accent);border:none;color:#fff;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:11px;margin-left:8px">查看密钥</button></h4>
+          <h4>🔑 已交付商品 <button onclick="loadOrderCards('${o.order_no}')" style="background:var(--accent);border:none;color:#fff;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px;margin-left:8px">查看密钥</button></h4>
           <div id="cards-content-${o.order_no}"></div>
         </div>`;
       }
@@ -1233,7 +1350,7 @@ async function openMyOrders() {
           <div class="order-card-info">
             <div class="o-name">${o.product_name || '商品'}</div>
             <div class="o-meta">
-              金额: ¥${Number(o.total_amount).toFixed(2)} · 数量: ${o.quantity || 1} · ${payNames[o.payment_method] || o.payment_method}<br>
+              金额: ${Number(o.total_amount).toFixed(2)} USDT · 数量: ${o.quantity || 1} · ${payNames[o.payment_method] || o.payment_method}<br>
               下单时间: ${o.created_at || '-'}
             </div>
           </div>
@@ -1245,7 +1362,6 @@ async function openMyOrders() {
       </div>`;
     }).join('');
 
-    // 启动倒计时刷新
     startOrderCountdown();
   } catch (e) {
     container.innerHTML = `<div class="orders-empty"><p>加载失败: ${e.message}</p></div>`;
@@ -1268,7 +1384,7 @@ async function loadOrderCards(orderNo) {
       <code>${c}</code>
       <button onclick="copyText('${c.replace(/'/g, "\\'")}')">复制</button>
     </div>`).join('') +
-    `<button class="btn btn-outline btn-sm" style="margin-top:8px" onclick="downloadCards('${orderNo}')">📥 下载全部 (.txt)</button>`;
+    `<button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="downloadCards('${orderNo}')">📥 下载全部 (.txt)</button>`;
   } catch (e) {
     el.innerHTML = `<div style="padding:8px;color:var(--danger);font-size:12px">加载失败: ${e.message}</div>`;
   }
@@ -1323,9 +1439,9 @@ function updateOrderSummary() {
   const total = (currentProduct.price * orderQty).toFixed(2);
   document.getElementById('orderSummary').innerHTML = `
     <div class="order-row"><span>商品</span><span>${currentProduct.name}</span></div>
-    <div class="order-row"><span>单价</span><span>¥${Number(currentProduct.price).toFixed(2)}</span></div>
+    <div class="order-row"><span>单价</span><span>${Number(currentProduct.price).toFixed(2)} USDT</span></div>
     <div class="order-row"><span>数量</span><span>x${orderQty}</span></div>
-    <div class="order-row total"><span>合计</span><span class="price">¥${total}</span></div>
+    <div class="order-row total"><span>合计</span><span class="price">${total} USDT</span></div>
   `;
 }
 
@@ -1358,7 +1474,6 @@ function updateQRDisplay() {
     qrPlaceholder.style.display = 'block';
   }
 
-  // Show USDT address if USDT selected
   if (selectedPayment === 'usdt' && siteSettings.usdt_address) {
     document.getElementById('usdtAddrText').textContent = siteSettings.usdt_address;
     usdtBox.style.display = 'block';
@@ -1388,7 +1503,6 @@ async function submitOrder() {
     });
     closeModal('orderModal');
     showToast(`订单已创建（${result.orderNo}），请联系客服确认支付`, 'info');
-    // Open CS panel
     contactCS();
   } catch (e) {
     showToast('下单失败: ' + e.message, 'error');
@@ -1412,14 +1526,14 @@ async function queryOrder() {
   try {
     const order = await api('/orders/' + no);
     const el = document.getElementById('queryResult');
-    let html = `<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:13px;color:var(--text);">`;
+    let html = `<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:13px;color:var(--text);">`;
     html += `<p><b>订单号:</b> ${order.orderNo || no}</p>`;
     html += `<p><b>状态:</b> ${order.orderStatus || '未知'}</p>`;
-    html += `<p><b>金额:</b> ¥${order.totalAmount || 0}</p>`;
+    html += `<p><b>金额:</b> ${order.totalAmount || 0} USDT</p>`;
     if (order.cards && order.cards.length) {
-      html += `<p style="margin-top:8px"><b>密钥:</b></p>`;
+      html += `<p style="margin-top:10px"><b>密钥:</b></p>`;
       order.cards.forEach((c, i) => {
-        html += `<div style="display:flex;gap:6px;align-items:center;margin-top:4px"><code style="flex:1;font-size:12px;color:var(--accent)">${c}</code><button onclick="copyText('${c}')" style="background:var(--accent);border:none;color:#fff;padding:2px 6px;border-radius:4px;cursor:pointer;font-size:11px">复制</button></div>`;
+        html += `<div style="display:flex;gap:6px;align-items:center;margin-top:6px"><code style="flex:1;font-size:12px;color:var(--accent)">${c}</code><button onclick="copyText('${c}')" style="background:var(--accent);border:none;color:#fff;padding:3px 8px;border-radius:6px;cursor:pointer;font-size:11px">复制</button></div>`;
       });
     }
     html += '</div>';
@@ -1478,7 +1592,7 @@ async function handleRegister() {
     currentUser = data.user;
     closeModal('authModal');
     updateAuthUI();
-    showToast('注册成功，赠送5元余额', 'success');
+    showToast('注册成功，赠送 5 USDT 余额', 'success');
   } catch (e) {
     showToast('注册失败: ' + e.message, 'error');
   }
@@ -1515,7 +1629,7 @@ function updateAuthUI() {
     const n = document.getElementById('userName');
     if (n) n.textContent = currentUser.username;
     const b = document.getElementById('userBalance');
-    if (b) b.textContent = '¥' + Number(currentUser.balance || 0).toFixed(2);
+    if (b) b.textContent = Number(currentUser.balance || 0).toFixed(2) + ' USDT';
     const a = document.getElementById('userAvatar');
     if (a) a.textContent = (currentUser.username || 'U').charAt(0).toUpperCase();
   } else {
@@ -1544,13 +1658,10 @@ document.addEventListener('click', e => {
 // ===== HTML Sanitizer =====
 function sanitizeHTML(html) {
   const doc = new DOMParser().parseFromString(html, 'text/html');
-  // Remove dangerous elements
   doc.querySelectorAll('script,iframe,object,embed,form,link,style,meta,base').forEach(el => el.remove());
-  // Remove event handler attributes (on*)
   doc.querySelectorAll('*').forEach(el => {
     for (const attr of [...el.attributes]) {
       if (/^on/i.test(attr.name)) el.removeAttribute(attr.name);
-      // Block javascript: URLs in href/src/action
       if (['href','src','action','xlink:href'].includes(attr.name.toLowerCase())) {
         const val = attr.value.trim().toLowerCase();
         if (val.startsWith('javascript:') || val.startsWith('data:text/html')) {
@@ -1575,7 +1686,7 @@ function showToast(msg, type = 'info') {
 // ===== Customer Service =====
 let csOpen = false;
 function toggleCs() {
-  csOpen = !csOpen;
+  csOpen = ! csOpen;
   document.getElementById('csPanel').classList.toggle('open', csOpen);
   document.getElementById('csToggle').classList.toggle('shifted', csOpen);
 }

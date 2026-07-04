@@ -65,7 +65,7 @@ router.post('/', optionalAuth, asyncHandler(async (req, res) => {
   // 余额支付：直接扣款并发货
   if (paymentMethod === 'balance') {
     if (!req.user) return fail(res, '余额支付需先登录', 401, 401);
-    if (req.user.balance < totalAmount) return fail(res, `余额不足，当前余额 ¥${req.user.balance.toFixed(2)}`);
+    if (req.user.balance < totalAmount) return fail(res, `余额不足，当前余额 ${req.user.balance.toFixed(2)} USDT`);
     const r = db.prepare(`INSERT INTO orders (order_no, user_id, product_id, quantity, unit_price, total_amount, email, payment_method, payment_status, order_status)
       VALUES (?, ?, ?, ?, ?, ?, ?, 'balance', 'paid', 'paid')`)
       .run(orderNo, req.user.id, productId, qty, product.price, totalAmount, email);

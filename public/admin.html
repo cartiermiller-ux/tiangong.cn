@@ -310,8 +310,8 @@ tr:hover td{background:rgba(0,212,255,.03)}
     <label>商品详情（支持HTML，显示在详情页）</label>
     <div style="font-size:11px;color:var(--dim);margin-bottom:4px">支持HTML: &lt;h3&gt;标题 &lt;p&gt;段落 &lt;pre&gt;&lt;code&gt;代码 &lt;img&gt; &lt;table&gt; &lt;ul&gt;&lt;li&gt;</div>
     <textarea id="pDetail" placeholder="<h3>商品详情</h3>&#10;<p>账号格式：账号----密码----api地址</p>&#10;<h3>使用说明</h3>&#10;<pre><code>示例API调用...</code></pre>" style="min-height:200px;font-family:monospace;font-size:12px"></textarea>
-    <label>价格 (元)</label><input id="pPrice" type="number" step="0.1" placeholder="29.9">
-    <label>原价 (元)</label><input id="pOriginal" type="number" step="0.1" placeholder="59.9">
+    <label>价格 (USDT)</label><input id="pPrice" type="number" step="0.01" placeholder="5.00">
+    <label>原价 (USDT)</label><input id="pOriginal" type="number" step="0.01" placeholder="10.00">
     <label>标签</label>
     <select id="pBadge" style="padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);width:100%">
       <option value="hot">热卖</option><option value="new">新品</option><option value="vip">VIP</option>
@@ -428,13 +428,13 @@ async function loadDashboard() {
       <div class="stat-card"><div class="label">在售商品</div><div class="val">${d.products}</div></div>
       <div class="stat-card"><div class="label">总订单</div><div class="val">${d.orders}</div></div>
       <div class="stat-card"><div class="label">已支付</div><div class="val green">${d.paidOrders}</div></div>
-      <div class="stat-card"><div class="label">总收入</div><div class="val gold">¥${Number(d.revenue).toFixed(1)}</div></div>
+      <div class="stat-card"><div class="label">总收入</div><div class="val gold">${Number(d.revenue).toFixed(1)} <small style="font-size:14px">USDT</small></div></div>
       <div class="stat-card"><div class="label">未售密钥</div><div class="val">${d.pendingCards}</div></div>
       <div class="stat-card"><div class="label">已售密钥</div><div class="val green">${d.soldCards}</div></div>
     `;
     const orders = await api('/admin/orders');
     document.getElementById('dashOrders').innerHTML = orders.list.slice(0, 5).map(o => `
-      <tr><td>${o.order_no}</td><td>${o.product_name || '-'}</td><td>¥${o.total_amount}</td>
+      <tr><td>${o.order_no}</td><td>${o.product_name || '-'}</td><td>${o.total_amount} USDT</td>
       <td><span class="badge badge-${o.payment_status}">${o.payment_status === 'paid' ? '已支付' : '待支付'}</span></td>
       <td>${o.created_at}</td></tr>
     `).join('');
@@ -447,7 +447,7 @@ function loadProducts() {
   if (!products.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--dim)">暂无商品</td></tr>'; return; }
   tbody.innerHTML = products.map(p => `
     <tr><td>${p.id}</td><td>${p.name}</td><td>${catName(p.category)}</td>
-    <td>¥${p.price} <s style="color:var(--dim);font-size:11px">¥${p.originalPrice || p.original_price || '-'}</s></td>
+    <td>${p.price} USDT <s style="color:var(--dim);font-size:11px">${p.originalPrice || p.original_price || '-'} USDT</s></td>
     <td>${p.stock}</td>
     <td><span class="badge badge-active">在售</span></td>
     <td>
@@ -564,7 +564,7 @@ async function loadOrders() {
         <td>${o.product_name || '-'}</td>
         <td>${o.username || '游客'}</td>
         <td>${o.email}</td>
-        <td>¥${o.total_amount}</td>
+        <td>${o.total_amount} USDT</td>
         <td><span class="badge badge-${payBadge}">${payLabel}</span>${countdown}</td>
         <td><span class="badge badge-${ordBadge}">${ordLabel}</span></td>
         <td>${o.created_at}</td>
@@ -612,7 +612,7 @@ async function loadUsers() {
     document.getElementById('userList').innerHTML = users.map(u => `
       <tr><td>${u.id}</td><td>${u.username}</td><td>${u.email}</td>
       <td>${u.role === 'admin' ? '<span style="color:var(--gold)">管理员</span>' : '用户'}</td>
-      <td>¥${Number(u.balance || 0).toFixed(2)}</td>
+      <td>${Number(u.balance || 0).toFixed(2)} USDT</td>
       <td><span class="badge badge-${u.status === 'active' ? 'active' : 'banned'}">${u.status === 'active' ? '正常' : '封禁'}</span></td>
       <td>${u.role !== 'admin' ? `<button class="btn btn-sm ${u.status === 'active' ? 'btn-danger' : 'btn-outline'}" onclick="toggleBan(${u.id}, '${u.status}')">${u.status === 'active' ? '封禁' : '解封'}</button>` : '-'}</td></tr>
     `).join('');
